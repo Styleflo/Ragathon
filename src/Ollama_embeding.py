@@ -321,35 +321,6 @@ def explain_cross(
     return response["response"]
 
 
-def handle_follow_up(question: str):
-    global conversation_state
-
-    previous_question = conversation_state["last_question"]
-    previous_answer = conversation_state["last_answer"]
-
-    contexts = retrieve_all_datasets(question)
-
-    result = generate_pandas_with_dataset_selection(
-        question,
-        contexts,
-        previous_question=previous_question,
-        previous_answer=previous_answer
-    )
-
-    dataset_keys = result["datasets"]
-    code_map = normalize_code_map(result)
-
-    results = execute_multi(code_map)
-
-    answer = explain_cross(
-        question,
-        results,
-        dataset_keys,
-        contexts,
-        previous_question=previous_question,
-        previous_answer=previous_answer
-    )
-
     conversation_state.update({
         "last_question": question,
         "last_answer": answer,
@@ -364,10 +335,6 @@ def handle_follow_up(question: str):
 
 def ask(question: str):
     global conversation_state
-
-    if is_follow_up(question) and conversation_state["last_question"] is not None:
-        print("Detected follow-up question.")
-        return handle_follow_up(question)
 
     contexts = retrieve_all_datasets(question)
 
