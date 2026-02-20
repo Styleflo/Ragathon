@@ -2,18 +2,15 @@
 venv/
 .env/
 .venv/
-db/95642c56-d478-4074-84b4-fef27dbaeaa6/link_lists.bin
-db/95642c56-d478-4074-84b4-fef27dbaeaa6/length.bin
-db/95642c56-d478-4074-84b4-fef27dbaeaa6/header.bin
-db/95642c56-d478-4074-84b4-fef27dbaeaa6/data_level0.bin
-db/chroma.sqlite3
-Data/requetes311.csv
-Corpus/description.txt
-
 
 # Autres trucs
 .idea/
 .DS_Store/
 
-
-CdC Sujet Hackathon IA 26-2.pdf
+db/95642c56-d478-4074-84b4-fef27dbaeaa6/link_lists.bin
+db/95642c56-d478-4074-84b4-fef27dbaeaa6/length.bin
+db/95642c56-d478-4074-84b4-fef27dbaeaa6/header.bin
+db/95642c56-d478-4074-84b4-fef27dbaeaa6/data_level0.bin
+db/chroma.sqlite3
+src/data/
+Corpus/description.txt
