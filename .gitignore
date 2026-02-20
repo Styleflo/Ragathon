@@ -1,3 +1,11 @@
+# Les environements
 venv/
 .env/
 .venv/
+
+# Autres trucs
+.idea/
+.DS_Store/
+
+
+CdC Sujet Hackathon IA 26-2.pdf
