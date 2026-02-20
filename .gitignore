@@ -12,5 +12,5 @@ db/95642c56-d478-4074-84b4-fef27dbaeaa6/length.bin
 db/95642c56-d478-4074-84b4-fef27dbaeaa6/header.bin
 db/95642c56-d478-4074-84b4-fef27dbaeaa6/data_level0.bin
 db/chroma.sqlite3
-src/data/
+src/data/*
 Corpus/description.txt
