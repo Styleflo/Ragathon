@@ -7,7 +7,7 @@ import langchain
 BASE_DIR = Path(__file__).resolve().parent
 SRC_DIR = BASE_DIR.parent
 
-DATA_DIR = SRC_DIR / "data"
+DATA_DIR = SRC_DIR / "desc"
 SOURCE_DIR = DATA_DIR / "contexte_metier_mobilite311.md"
 
 with open(SOURCE_DIR, "r", encoding="utf-8") as f:
