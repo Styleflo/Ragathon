@@ -70,5 +70,5 @@ def download_weather_csv(station_id, start_year=2022):
         print("Aucune donnée n'a pu être récupérée.")
 
 if __name__ == "__main__":
-    # Exemple d'utilisation pour Montréal, Février 2026
-    download_weather_csv("51157", 2023)
+    csv311_reload()
+    download_weather_csv("51157", 2022)
