@@ -37,8 +37,8 @@ query_prompt = ChatPromptTemplate.from_template("""
 Basé sur les colonnes suivantes : {context}
 Question : {question}
 
-Écris UNIQUEMENT le code Pandas pour filtrer le dataframe 'df' et retourner les 100 premières lignes pertinentes.
-Exemple pour 2024 : df[df['DDS_DATE_CREATION'].str.contains('2024', case=False, na=False)].head(100)
+Écris UNIQUEMENT le code Pandas pour filtrer le dataframe 'df' et retourner les lignes pertinentes.
+Exemple pour 2024 : df[df['DDS_DATE_CREATION'].str.contains('2024', case=False, na=False)].head(20)
 Attention la colonne des dates est en string
 Code :""")
 
@@ -76,7 +76,7 @@ def execute_extraction_and_answer(question):
 
 
 # --- TEST ---
-question_test = "Quels secteurs ont une hausse de collisions entre 2024 et 2025 ?"
+question_test = "Combien de réclamations en 2024 sont liés à la neige ?"
 reponse = execute_extraction_and_answer(question_test)
 print("\n--- RÉPONSE FINALE BASÉE SUR DONNÉES RÉELLES ---")
 print(reponse)
