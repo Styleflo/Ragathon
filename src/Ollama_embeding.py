@@ -112,56 +112,73 @@ def generate_pandas_with_dataset_selection(
 
     prompt = f"""
         You are a python/pandas query generator.
-         
-        Your task:
-            1. Transform the user question into a set of python/pandas commands.
-            2. Each command must directly answer one core component of the question.
-            3. You may ONLY use the datasets and columns explicitly provided.
-            4. You MUST NOT invent or guess column names.
-            5. You MUST NOT use a dataset if none of its columns relate to the question.
-            6. You may generate multiple commands per dataset if needed.
-            7. Output ONLY a flat JSON dictionary mapping keys to pandas expressions.
 
-            How to determine relevance:
-            1. A dataset is relevant if at least one of its columns semantically matches
-            a concept in the question (e.g., "bicyclette", "année", "accident").
+        Your goal:
+        Generate ALL pandas queries needed to fully answer the user’s question.
+
+        COLUMN FAMILY RULE:
+            If the question refers to a category (e.g., “types of vehicles”, “types of transport”, “types of locations”, etc.), 
+            you MUST identify ALL columns in the dataset that belong to that category.
+
+            A column belongs to a category if:
+            - its name contains a shared prefix (e.g., nb_*)
+            - its description indicates it is part of the same conceptual group
+            - it measures a subtype of the same concept
+
+            For each column in the category, you MUST generate at least one query.
+            You MUST NOT invent aggregate columns (e.g., NB_VEH_IMPLIQUES_ACCDN).
+            You MUST enumerate each real column individually.
+
+        STRICT RULES:
+            1. You may ONLY use the datasets and columns explicitly provided.
+            2. You MUST NOT invent or guess column names.
+            3. You MUST NOT use a dataset if none of its columns relate to the question.
+            4. You MUST output ONLY a flat JSON dictionary:
+            {{
+                "dataset_query_1": "pandas_expression",
+                "dataset_query_2": "pandas_expression"
+            }}
+            5. Each value MUST be a single pandas expression.
+            6. You MUST NOT output lists, nested structures, explanations, or comments.
+
+        How to determine relevance:
+            1. A dataset is relevant if ANY of its columns semantically match a concept in the question.
             2. A column is relevant if its meaning overlaps with a concept in the question.
-            3. If no column matches a concept, the dataset MUST be ignored.
+            3. If multiple columns match, you MUST generate one query PER COLUMN.
+            4. You MUST NOT stop after the first relevant column.
 
-            Guide to operate:
+        How to generate enough queries:
+        For EACH core component of the question:
+            1. Identify ALL relevant datasets.
+            2. Identify ALL relevant columns in those datasets.
+            3. For EACH relevant column, generate MULTIPLE analytical queries:
+            - distribution (value counts, top/bottom)
+            - grouping (e.g., by year, by arrondissement, by type)
+            - trends over time (if a time column exists)
+            - correlations (if multiple relevant numeric columns exist)
+            - comparisons (if multiple categories exist)
+            4. You MUST generate as many queries as needed to fully cover the question.
+            5. You MUST be exhaustive and thorough.
+            6. Do NOT stop at the simplest query.
+
+        Guide to operate:
             1. Break the question into core components.
-            2. For each component, identify which dataset(s) contain relevant columns.
-            3. For each core components, generate a pandas expression that
-            directly answers that component.
-            4. Do NOT generate queries that do not contribute to answering the question.
-            5. Do NOT copy the examples you are given, they are only here for structure.
-            6. You can use multiple request per dataset to cover everything that is needed.
-
+            2. For each component, explore ALL relevant datasets.
+            3. For each dataset, explore ALL relevant columns.
+            4. For each column, generate multiple queries covering different analytical angles.
 
         You can use this context to guide your decisions:
-        Here are the available datasets, each with:
-        - its dataset key
-        - its dataframe name
-        - its retrieved context (column descriptions, semantics)
-        {json.dumps(datasets_block, indent=2, ensure_ascii=False)}
+        {datasets_block}
 
         Current user question:
         {question}
-        
-        Your output MUST follow this exact schema:
 
+        Your output MUST follow this exact schema:
         {{
             "dataset_key_1_query_1": "pandas_expression",
             "dataset_key_1_query_2": "pandas_expression",
             "dataset_key_2_query_1": "pandas_expression"
         }}
-
-        Each key MUST be a unique string.
-        Each value MUST be a single pandas expression.
-        You MUST NOT output lists.
-        You MUST NOT group queries by dataset.
-        You MUST NOT nest structures.
-
         """
 
     print(prompt)
@@ -221,6 +238,7 @@ def explain_cross(
             ➢ Ce que je vérifierais ensuite.
         3. Answer in french
         4. If the data is irrelevant and you cant answer properly you must say so.
+        5. Do not use the columns names and data names directly in the answer, use descriptions.
         
         Your task :
 
