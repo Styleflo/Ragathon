@@ -21,16 +21,6 @@ df_requetes311 = datasets["requetes311"]["df"]
 df_collisions_routieres = datasets["collisions_routieres"]["df"]
 
 
-conversation_state = {
-    "last_question": None,
-    "last_answer": None,
-    "last_dataset_keys": None,
-    "last_code_map": None,
-    "last_results": None,
-    "last_contexts": None
-}
-
-
 def embed(text: str):
     response = ollama.embed(model="nomic-embed-text", input=text)
     return response["embeddings"][0]
@@ -54,20 +44,6 @@ for key, info in datasets.items():
             documents=[chunk],
             embeddings=[embed(chunk)]
         )
-
-
-def is_follow_up(question: str) -> bool:
-    prompt = f"""
-        You are a classifier.
-
-        User question:
-        {question}
-
-        Determine if this question is a FOLLOW-UP to a previous one.
-        Return ONLY "yes" or "no".
-        """
-    response = ollama.generate(model="gemma3:4b", prompt=prompt)
-    return response["response"].strip().lower() == "yes"
 
 
 def retrieve(question: str, dataset_key: str):
@@ -119,23 +95,7 @@ def safe_json_loads(raw: str):
 def generate_pandas_with_dataset_selection(
     question: str,
     contexts: dict,
-    previous_question: str | None = None,
-    previous_answer: str | None = None
 ):
-
-    if previous_question and previous_answer:
-        followup_block = f"""
-            This is a FOLLOW-UP question.
-
-            Previous user question:
-            {previous_question}
-
-            Previous assistant answer:
-            {previous_answer}
-            """
-    else:
-        followup_block = "This is an INDEPENDENT question (not a follow-up)."
-        
 
     datasets_block = {
         "requetes311": {
@@ -151,66 +111,65 @@ def generate_pandas_with_dataset_selection(
     }
 
     prompt = f"""
-        You are a multi-dataset data assistant.
+        You are a python/pandas query generator.
+         
+        Your task:
+            1. Transform the user question into a set of python/pandas commands.
+            2. Each command must directly answer one core component of the question.
+            3. You may ONLY use the datasets and columns explicitly provided.
+            4. You MUST NOT invent or guess column names.
+            5. You MUST NOT use a dataset if none of its columns relate to the question.
+            6. You may generate multiple commands per dataset if needed.
+            7. Output ONLY a flat JSON dictionary mapping keys to pandas expressions.
 
-        {followup_block}
+            How to determine relevance:
+            1. A dataset is relevant if at least one of its columns semantically matches
+            a concept in the question (e.g., "bicyclette", "année", "accident").
+            2. A column is relevant if its meaning overlaps with a concept in the question.
+            3. If no column matches a concept, the dataset MUST be ignored.
 
-         Here are the available datasets, each with:
+            Guide to operate:
+            1. Break the question into core components.
+            2. For each component, identify which dataset(s) contain relevant columns.
+            3. For each relevant dataset, generate the simplest pandas expression that
+            directly answers that component.
+            4. Do NOT generate queries that do not contribute to answering the question.
+
+            Example (literal) for the question: quelle est la tandences de accidents de bicyclette par années et y a t'il un lien avec les accidents de voitures?
+            {{
+                "collisions_routieres_1": "df_collisions_routieres.groupby('ANNEE')['NB_VELO'].sum()",
+                "collisions_routieres_2": "df_collisions_routieres.groupby('ANNEE')['NB_AUTO'].sum()"
+            }}
+
+
+        You can use this context to guide your decision:
+        {contexts}
+
+        Here are the available datasets, each with:
         - its dataset key
         - its dataframe name
         - its retrieved context (column descriptions, semantics)
-
-        DATASETS (JSON):
         {json.dumps(datasets_block, indent=2, ensure_ascii=False)}
 
         Current user question:
         {question}
-
-        Return ONLY a JSON object:
-        - "datasets": list of dataset keys
-        - "code": mapping dataset_key → pandas expression
-
-        Your tasks:
-        1. Decide which datasets are relevant to the question.
-        2. For each relevant dataset, generate a pandas expression using the correct dataframe name.
-        3. If this is a follow-up, REUSE the relevant filters from the previous answer when appropriate
-        4. Only use columns that exist whithin the dataset column list.
-        5. NEVER mix columns from different datasets.
-        6. ALWAYS return full pandas expressions.
-
-        Contrainte:
-        The code MUST be valid Python using pandas. Absolutely NO R syntax, NO tidyverse
-        ONLY return an output if the corresponding dataset is relevant.
-
-         Example output:
+        
+        Example of output formating:
         {{
-        "datasets": ["requetes311"],
-        "code": {{
-            "requetes311": "df_requetes311[df_requetes311['ACTI_NOM'] == 'Organisme divers']"
+            "requetes311_1": "df_requetes311[df_requetes311['ACTI_NOM'] == 'Organisme divers']",
+            "collisions_routieres_1": "df_collisions_routieres.groupby('SEMN_ACCDN').size()",
+            "collisions_routieres_2": "df_collisions_routieres.groupby('JR_SEMN_ACCDN')['NB_VELO'].sum()",
+            "requetes311_2": "df_requetes311[df_requetes311['TYPE_LIEU_INTERV'] != '']"
         }}
-        }}
+
         """
 
+    print(prompt)
     response = ollama.generate(model="gemma3:4b", prompt=prompt)
     raw = response["response"].strip()
     print(raw)
-    print(contexts)
 
     return safe_json_loads(raw)
-
-def normalize_code_map(result):
-    datasets_list = result.get("datasets", [])
-    code_block = result.get("code")
-
-    if isinstance(code_block, dict):
-        return code_block
-
-    if isinstance(code_block, str):
-        if len(datasets_list) != 1:
-            raise ValueError("LLM returned a single code string but multiple datasets were selected.")
-        return {datasets_list[0]: code_block}
-
-    raise ValueError(f"Invalid code format returned by LLM: {code_block}")
 
 
 
@@ -224,6 +183,7 @@ def execute_multi(code_map: dict):
     }
 
     for key, code in code_map.items():
+        print(key, code)
         try:
             res = eval(code, env)
             results[key] = {"ok": True, "result": res, "code": code}
@@ -237,100 +197,84 @@ def execute_multi(code_map: dict):
 def explain_cross(
     question: str,
     results: dict,
-    dataset_keys,
     contexts: dict,
-    previous_question: str | None = None,
-    previous_answer: str | None = None
 ):
 
-    previews = []
-    for key in dataset_keys:
-        info = results.get(key)
-        if not info:
-            continue
 
-        if not info["ok"]:
-            previews.append(f"Dataset {key} FAILED with error: {info['error']}")
-        else:
-            df_res = info["result"]
-            if hasattr(df_res, "head"):
-                preview = df_res.head(10).to_string()
-            else:
-                preview = str(df_res)
-
-            previews.append(f"Dataset: {key}\nCode: {info['code']}\nPreview:\n{preview}")
-
-    previews_text = "\n\n====\n\n".join(previews)
-
-    if previous_question and previous_answer:
-        followup_block = f"""
-            Cette question est un SUIVI (follow-up).
-
-            Question précédente :
-            {previous_question}
-
-            Réponse précédente :
-            {previous_answer}
-
-            Tu dois interpréter la nouvelle question à la lumière de cette interaction précédente,
-            et préciser clairement comment les nouveaux résultats se comparent ou se rattachent aux précédents.
-            """
-    else:
-        followup_block = "Cette question est indépendante."
 
     prompt = f"""
-        Tu es un assistant analytique.
+        You are a data analyst that use data to answer questions.
 
-        {followup_block}
-
-        Contexte des jeux de données :
+        You may use this context to help formulate your answer, but only only use data from the data.:
         {json.dumps(contexts, indent=2, ensure_ascii=False)}
 
-        Question actuelle :
+        The data, this is you main source of informations:
+        {results}
+
+        This is the question you must answer has precisely has possible :
         {question}
 
-        Résultats :
-        {previews_text}
-
-        Tâche :
-        1. Ne rejoute pas d'information, répond aussi précisément que possible et le plus bref possible.
-        2. Si c'est un suivi, explique explicitement le lien avec la réponse précédente
-        3. Ajoute ensuite une section intitulée : "Limites / risques d’interprétation "
-        - Mentionne les hypothèses fragiles, les biais possibles, les limites des données.
-        4. Ajoute enfin une section : "Ce que je vérifierais ensuite"
-        - Propose des validations, tests, croisements de données ou analyses complémentaires.
-
-        Contrainte:
-        - Tu ne peux pas inventer de chiffres, tout doit provenir des données.
-        - Ne réfère jamais au nom du dataset utilisé directement.
-        - La réponse DOIT être cohérente avec la question.
-
-        Respecte strictement ce format :
+        Constraint:
+        1. You MUST NOT invent number in your answer, only use the ones present in the provided data.
+        2. After the answer you must provide:
+            ➢ Limite /risques d’interprétation ET/OU 
+            ➢ Ce que je vérifierais ensuite.
+        3. Answer in french
+        
+        Your task :
 
         ### Analyse
-        (réponse analytique)
 
-        ### Limites / risques d’interprétation
-        (critique)
+        Here are example of questions and the type of answer expected, chose the proper format accodingly
 
-        ### Ce que je vérifierais ensuite
-        (suite logique)
+        a.Chat analytique “data-grounded” 
+            • Exemples de questions : 
+                o Quels secteurs ont une hausse de collisions en conditions de pluie/neige 
+                ? 
+                o Quels types de requêtes 311 augmentent quand la température passe sous 
+                0°C ? 
+                o Autour de quels axes STM (arrêts/lignes) observe-t-on le plus de 
+                collisions graves ? 
+            • Réponses avec preuves : citations de lignes/agrégats, filtres appliqués, période, et 
+            limites. 
+        b. Génération de synthèses utiles 
+            • Briefing automatique hebdomadaire : 
+                o top 5 hotspots, tendances, signaux faibles 
+                o recommandations (p. ex. : ciblage de déneigement, signalisation, 
+                inspection) 
+            • Version grand public vs municipalité (2 tons, même fondement data). 
+                Plus précisément, … 
+                Top 5 hotspots 
+                Les 5 endroits (ou zones) où le problème est le plus concentré, selon un critère 
+                clair. 
+            • Exemples de critères : 
+                o Collisions : intersections / segments de rue avec le plus de collisions 
+                (ou collisions graves) sur une période. 
+                o 311 : secteurs avec le plus de requêtes « nids-de-poule », 
+                « déneigement », « éclairage ». 
+                o STM : arrêts/lignes avec le plus de perturbations (si dispo.). 
+            • Format attendu : 
+                o Hotspot #1 : Intersection A - 32 collisions (dont 6 graves), surtout 
+                entre 16h–19h, pluie. 
+                o Hotspot #2 : Zone B (rayon 300 m) - 120 requêtes 311 
+                « déneigement » en 2 semaines. 
+        c. Tendances 
+            L’évolution dans le temps : ça augmente, ça baisse, ça change de nature. 
+            • Exemples : 
+                o Les collisions piétons augmentent de 18% sur les 3 derniers mois vs 
+                la même période l’an passé. 
+                o Les requêtes 311 « nids-de-poule » explosent 7 à 10 jours après les 
+                cycles gel/dégel. 
+                o Le pic horaire se déplace : avant entre 17h et 19h, maintenant entre 
+                15h et 17h. 
+                • Format attendu : 
+                o Période, comparaison (p. ex., semaine vs semaine / mois vs mois), et 
+                une phrase d’interprétation. 
         """
 
+    print(prompt)
     response = ollama.generate(model="gemma3:4b", prompt=prompt)
     return response["response"]
-
-
-    conversation_state.update({
-        "last_question": question,
-        "last_answer": answer,
-        "last_dataset_keys": dataset_keys,
-        "last_code_map": code_map,
-        "last_results": results,
-        "last_contexts": contexts
-    })
-
-    return answer
 
 
 def ask(question: str):
@@ -338,46 +282,26 @@ def ask(question: str):
 
     contexts = retrieve_all_datasets(question)
 
-    result = generate_pandas_with_dataset_selection(
+    results = generate_pandas_with_dataset_selection(
         question,
         contexts,
-        previous_question=None,
-        previous_answer=None
     )
 
-    dataset_keys = result["datasets"]
-    code_map = normalize_code_map(result)
 
-    results = execute_multi(code_map)
+    results = execute_multi(results)
     for k, v in results.items():
         print(f"[{k}] ok={v['ok']}")
 
     answer = explain_cross(
         question,
         results,
-        dataset_keys,
         contexts,
-        previous_question=None,
-        previous_answer=None
     )
-
-    conversation_state.update({
-        "last_question": question,
-        "last_answer": answer,
-        "last_dataset_keys": dataset_keys,
-        "last_code_map": code_map,
-        "last_results": results,
-        "last_contexts": contexts
-    })
-
     return answer
 
 if __name__ == "__main__":
-    q1 = "en quelle année y a t'il eu le plus de bicyclette dans des accidents?"
+    q1 = "quelle est la tandences de accidents de bicyclette par années et y a t'il un lien avec les accidents de voitures?"
     print(ask(q1))
-
-    q2 = "y a t'il eu une tendance à la hausse pour le nombre de bicyclette?"
-    print(ask(q2))
 
 
 
