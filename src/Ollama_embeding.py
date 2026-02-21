@@ -4,16 +4,19 @@ from langchain_text_splitters import MarkdownHeaderTextSplitter
 import pandas as pd
 import json
 
+EMBEDDING_MODEL = "bge-m3"
+LANGUAGE_MODEL = "qwen2.5-coder"
+
 datasets = {
     "requetes311": {
         "df": pd.read_csv("data/requetes311.csv", low_memory=False),
         "collection": chromadb.PersistentClient(path="db_requetes311").get_or_create_collection("requetes311_rag"),
-        "description_file": "corpus/requetes311.txt"
+        "description_file": "corpus/requetes311.md"
     },
     "collisions_routieres": {
         "df": pd.read_csv("data/collisions_routieres.csv", low_memory=False),
         "collection": chromadb.PersistentClient(path="db_collisions_routieres").get_or_create_collection("collisions_routieres_rag"),
-        "description_file": "corpus/collisions_routieres.txt"
+        "description_file": "corpus/collisions_routieres.md"
     }
 }
 
@@ -22,7 +25,7 @@ df_collisions_routieres = datasets["collisions_routieres"]["df"]
 
 
 def embed(text: str):
-    response = ollama.embed(model="nomic-embed-text", input=text)
+    response = ollama.embed(model=EMBEDDING_MODEL, input=text)
     return response["embeddings"][0]
 
 headers_to_split_on = [
@@ -48,12 +51,12 @@ for key, info in datasets.items():
     chunks = markdown_splitter.split_text(text)
 
     for i, chunk in enumerate(chunks):
-        text_to_embed = chunk.page_content
+        text_content = chunk.page_content
         metadata = chunk.metadata
         collection.add(
             ids=[f"{key}_chunk_{i}"],
-            documents=[chunk],
-            embeddings=[embed(text_to_embed)],
+            documents=[text_content],
+            embeddings=[embed(text_content)],
             metadatas=[metadata]
         )
 
@@ -177,7 +180,7 @@ def generate_pandas_with_dataset_selection(
         """
 
     print(prompt)
-    response = ollama.generate(model="gemma3:4b", prompt=prompt)
+    response = ollama.generate(model=LANGUAGE_MODEL, prompt=prompt)
     raw = response["response"].strip()
     print(raw)
 
@@ -286,7 +289,7 @@ def explain_cross(
         """
 
     print(prompt)
-    response = ollama.generate(model="gemma3:4b", prompt=prompt)
+    response = ollama.generate(model=LANGUAGE_MODEL, prompt=prompt)
     return response["response"]
 
 
