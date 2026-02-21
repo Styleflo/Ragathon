@@ -131,20 +131,14 @@ def generate_pandas_with_dataset_selection(
             Guide to operate:
             1. Break the question into core components.
             2. For each component, identify which dataset(s) contain relevant columns.
-            3. For each relevant dataset, generate the simplest pandas expression that
+            3. For each core components, generate a pandas expression that
             directly answers that component.
             4. Do NOT generate queries that do not contribute to answering the question.
-
-            Example (literal) for the question: quelle est la tandences de accidents de bicyclette par années et y a t'il un lien avec les accidents de voitures?
-            {{
-                "collisions_routieres_1": "df_collisions_routieres.groupby('ANNEE')['NB_VELO'].sum()",
-                "collisions_routieres_2": "df_collisions_routieres.groupby('ANNEE')['NB_AUTO'].sum()"
-            }}
+            5. Do NOT copy the examples you are given, they are only here for structure.
+            6. You can use multiple request per dataset to cover everything that is needed.
 
 
-        You can use this context to guide your decision:
-        {contexts}
-
+        You can use this context to guide your decisions:
         Here are the available datasets, each with:
         - its dataset key
         - its dataframe name
@@ -154,13 +148,19 @@ def generate_pandas_with_dataset_selection(
         Current user question:
         {question}
         
-        Example of output formating:
+        Your output MUST follow this exact schema:
+
         {{
-            "requetes311_1": "df_requetes311[df_requetes311['ACTI_NOM'] == 'Organisme divers']",
-            "collisions_routieres_1": "df_collisions_routieres.groupby('SEMN_ACCDN').size()",
-            "collisions_routieres_2": "df_collisions_routieres.groupby('JR_SEMN_ACCDN')['NB_VELO'].sum()",
-            "requetes311_2": "df_requetes311[df_requetes311['TYPE_LIEU_INTERV'] != '']"
+            "dataset_key_1_query_1": "pandas_expression",
+            "dataset_key_1_query_2": "pandas_expression",
+            "dataset_key_2_query_1": "pandas_expression"
         }}
+
+        Each key MUST be a unique string.
+        Each value MUST be a single pandas expression.
+        You MUST NOT output lists.
+        You MUST NOT group queries by dataset.
+        You MUST NOT nest structures.
 
         """
 
@@ -220,6 +220,7 @@ def explain_cross(
             ➢ Limite /risques d’interprétation ET/OU 
             ➢ Ce que je vérifierais ensuite.
         3. Answer in french
+        4. If the data is irrelevant and you cant answer properly you must say so.
         
         Your task :
 
@@ -300,7 +301,7 @@ def ask(question: str):
     return answer
 
 if __name__ == "__main__":
-    q1 = "quelle est la tandences de accidents de bicyclette par années et y a t'il un lien avec les accidents de voitures?"
+    q1 = "quelle est le top 5 des locations des accidents de voiture et quelle est le top 5 des types de moyen de transport impliquer dans des accidents"
     print(ask(q1))
 
 
