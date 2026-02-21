@@ -11,12 +11,12 @@ datasets = {
     "requetes311": {
         "df": pd.read_csv("data/requetes311.csv", low_memory=False),
         "collection": chromadb.PersistentClient(path="db_requetes311").get_or_create_collection("requetes311_rag"),
-        "description_file": "corpus/requetes311.md"
+        "description_file": "desk/requetes311.md"
     },
     "collisions_routieres": {
         "df": pd.read_csv("data/collisions_routieres.csv", low_memory=False),
         "collection": chromadb.PersistentClient(path="db_collisions_routieres").get_or_create_collection("collisions_routieres_rag"),
-        "description_file": "corpus/collisions_routieres.md"
+        "description_file": "desk/collisions_routieres.md"
     }
 }
 
