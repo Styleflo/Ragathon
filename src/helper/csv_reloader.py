@@ -63,7 +63,7 @@ def download_weather_csv(station_id, start_year=2022):
         final_df = pd.concat(all_data, ignore_index=True)
 
         # Sauvegarde unique
-        output_file = DATA_DIR / f"meteo_montreal_{start_year}_a_aujourdhui.csv"
+        output_file = DATA_DIR / f"meteo_montreal.csv"
         final_df.to_csv(output_file, index=False, encoding='utf-8-sig')
         print(f"\nEnregistrement terminé ! {len(final_df)} jours enregistrés dans {output_file}")
     else:
