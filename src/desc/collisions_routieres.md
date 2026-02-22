@@ -1,301 +1,300 @@
-# Dataset : collisions_routieres.csv
+# collisions_routieres.csv
 
-## Column name : AN
-### Value type :
-#### Value examples :
-Année de l'accident (AAAA).
+## AN
+### Num
+#### AAAA
+Année de l'accident au format AAAA.
 
-## Column name : NO_SEQ_COLL
-### Value type :
-#### Value examples :
-Numéro séquentiel identifiant l'accident. Composé de l'année de l'accident et d'un numéro séquentiel. (AAAA _ 999, où l'année et le numéro séquentiel sont séparés par un espace, une barre de soulignement et un espace)
+## NO_SEQ_COLL
+### Alph
+#### AAAA _ 999
+Numéro séquentiel identifiant l'accident, composé de l'année et d'un numéro séquentiel séparés par un espace et une barre de soulignement.
 
-## Column name : DT_ACCDN
-### Value type :
-#### Value examples :
-Date de l’accident (AAAA-MM-JJ).
+## DT_ACCDN
+### Alph
+#### AAAA-MM-JJ
+Date précise de l'accident au format année-mois-jour.
 
-## Column name : HR_ACCDN
-### Value type :
-#### Value examples :
-Heure de l’accident. Intervalle de 60 minutes, contenant l'heure réelle de l'accident. Exemple: 20:00:00-20:59:59
+## HR_ACCDN
+### Alph
+#### 20:00:00-20:59:59
+Heure de l'accident présentée par intervalle de 60 minutes.
 
-## Column name : JR_SEMN_ACCDN
-### Value type :
-#### Value examples :
-Jour de la semaine de la date de l’accident:
+## JR_SEMN_ACCDN
+### Alph
+#### DI (Dimanche), TU (Lundi), MA (Mardi), ME (Mercredi), JE (Jeudi), VE (Vendredi), SA (Samedi)
+Jour de la semaine : Dimanche, Lundi, Mardi, Mercredi, Jeudi, Vendredi, Samedi.
 
-## Column name : GRAVITÉ
-### Value type :
-#### Value examples :
-Gravité de l’accident: Indique la gravité de l’accident en fonction de la présence et de l'état des victimes.
+## GRAVITÉ
+### Alph
+#### Mortel, Grave, Léger, Dommages matériels seulement
+Indique la gravité de l'accident selon l'état des victimes ou l'importance des dommages matériels.
 
-## Column name : NB_MORTS
-### Value type :
-#### Value examples :
-Nombre de victimes décédées dans les 30 jours suivant l'accident
+## NB_MORTS
+### Num
+#### N/A
+Nombre de victimes décédées dans les 30 jours suivant l'accident.
 
-## Column name : NB_BLESSES_GRAVES
-### Value type :
-#### Value examples :
-Nombre de victimes blessées gravement
+## NB_BLESSES_GRAVES
+### Num
+#### N/A
+Nombre de victimes blessées gravement nécessitant une hospitalisation.
 
-## Column name : NB_BLESSES_LEGERS
-### Value type :
-#### Value examples :
-Nombre de victimes blessées légèrement
+## NB_BLESSES_LEGERS
+### Num
+#### N/A
+Nombre de victimes blessées légèrement ne nécessitant pas d'hospitalisation.
 
-## Column name : NB_VICTIMES_TOTAL
-### Value type :
-#### Value examples :
-Nombre total de victimes (décès, blessés graves et blessés légers) dans l'accident
+## NB_VICTIMES_TOTAL
+### Num
+#### N/A
+Somme totale des décès, blessés graves et blessés légers.
 
-## Column name : NB_VEH_IMPLIQUES_ACCDN
-### Value type :
-#### Value examples :
-Nombre de véhicules impliqués dans l'accident
+## NB_VEH_IMPLIQUES_ACCDN
+### Num
+#### N/A
+Nombre total de véhicules impliqués dans l'accident.
 
-## Column name : NB_DECES_PIETON
-### Value type :
-#### Value examples :
-Nombre de piétons décédés dans les 30 jours suivant l'accident
+## NB_DECES_PIETON
+### Num
+#### N/A
+Nombre de piétons décédés suite à l'accident.
 
-## Column name : NB_BLESSES_PIETON
-### Value type :
-#### Value examples :
-Nombre de piétons blessés (gravement ou légèrement) dans l'accident
+## NB_BLESSES_PIETON
+### Num
+#### N/A
+Nombre de piétons blessés (graves ou légers) dans l'accident.
 
-## Column name : NB_VICTIMES_PIETON
-### Value type :
-#### Value examples :
-Nombre de victimes piétons (blessés ou décédés) dans l'accident
+## NB_VICTIMES_PIETON
+### Num
+#### N/A
+Nombre total de victimes parmi les piétons dand l'accident.
 
-## Column name : NB_DECES_MOTO
-### Value type :
-#### Value examples :
-Nombre de motocyclistes décédés dans les 30 jours suivant l'accident
+## NB_DECES_MOTO
+### Num
+#### N/A
+Nombre de motocyclistes décédés dans l'accident.
 
-## Column name : NB_BLESSES_MOTO
-### Value type :
-#### Value examples :
-Nombre de motocyclistes blessés (gravement ou légèrement) dans l'accident
+## NB_BLESSES_MOTO
+### Num
+#### N/A
+Nombre de motocyclistes blessés dans l'accident.
 
-## Column name : NB_VICTIMES_MOTO
-### Value type :
-#### Value examples :
-Nombre de victimes motocyclistes (blessés ou décédés) dans l'accident
+## NB_VICTIMES_MOTO
+### Num
+#### N/A
+Nombre total de victimes parmi les motocyclistes.
 
-## Column name : NB_DECES_VELO
-### Value type :
-#### Value examples :
-Nombre de cyclistes décédés dans les 30 jours suivant l'accident
+## NB_DECES_VELO
+### Num
+#### N/A
+Nombre de cyclistes décédés.
 
-## Column name : NB_BLESSES_VELO
-### Value type :
-#### Value examples :
-Nombre de cyclistes blessés (gravement ou légèrement) dans l'accident
+## NB_BLESSES_VELO
+### Num
+#### N/A
+Nombre de cyclistes blessés.
 
-## Column name : NB_VICTIMES_VELO
-### Value type :
-#### Value examples :
-Nombre de victimes cyclistes (blessés ou décédés) dans l'accident
+## NB_VICTIMES_VELO
+### Num
+#### N/A
+Nombre total de victimes parmi les cyclistes.
 
-## Column name : CD_MUNCP
-### Value type :
-#### Value examples :
-Code géographique de la municipalité où a eu lieu l’accident: Code inscrit ou codifié sur le rapport (voir www.mamrot.gouv.qc.ca)
+## CD_MUNCP
+### Alph
+#### N/A
+Code géographique de la municipalité où l'accident a eu lieu.
 
-## Column name : MRC
-### Value type :
-#### Value examples :
-Nom de la municipalité régionale de comté où a eu lieu l'accident. La MRC est calculée à partir du code géographique de la municipalité
+## MRC
+### Alph
+#### N/A
+Nom de la municipalité régionale de comté (MRC).
 
-## Column name : NO_CIVIQ_ACCDN
-### Value type :
-#### Value examples :
-Numéro civique de l’immeuble près du lieu de l’accident: Numéro de l’immeuble qui se situe en face ou près du lieu de l’accident.
+## NO_CIVIQ_ACCDN
+### Alph
+#### N/A
+Numéro civique de l'immeuble le plus proche du lieu de l'impact.
 
-## Column name : SFX_NO_CIVIQ_ACCDN
-### Value type :
-#### Value examples :
-Suffixe du numéro civique de l’immeuble
+## SFX_NO_CIVIQ_ACCDN
+### Alph
+#### N/A
+Suffixe du numéro civique de l'immeuble (ex: A, B).
 
-## Column name : RUE_ACCDN
-### Value type :
-#### Value examples :
-Rue, rang ou chemin du lieu de l’accident Nom de la rue, du rang ou du chemin où l'accident est survenu
+## RUE_ACCDN
+### Alph
+#### N/A
+Nom de la rue, du rang ou du chemin du lieu de l'accident.
 
-## Column name : REG_ADM
-### Value type :
-#### Value examples :
-Région administrative du Québec: La région administrative est déterminée à partir du code de municipalité.
+## REG_ADM
+### Alph
+#### 01 (Bas-Saint-Laurent), 02 (Saguenay―Lac-Saint-Jean), 03 (Capitale-Nationale), 04 (Mauricie), 05 (Estrie), 06 (Montréal), 07 (Outaouais), 08 (Abitibi-Témiscamingue), 09 (Côte-Nord), 10 (Nord-du-Québec), 11 (Gaspésie―Îles-de-la-Madeleine), 12 (Chaudière-Appalaches), 13 (Laval), 14 (Lanaudière), 15 (Laurentides), 16 (Montérégie), 17 (Centre-du-Québec)
+Région administrative du Québec (ex: Montréal, Estrie, Laurentides).
 
-## Column name : ACCDN_PRES_DE
-### Value type :
-#### Value examples :
-Repère près d’où l’accident est survenu: Le repère peut être une intersection entre deux routes ou un repère de type école, commerce, etc.
+## ACCDN_PRES_DE
+### Alph
+#### N/A
+Nom de la rue transversale pour une intersection ou nom d'un repère (école, commerce).
 
-## Column name : NO_ROUTE
-### Value type :
-#### Value examples :
-Numéro de la route où l’accident est survenu, s’il y a lieu.
+## NO_ROUTE
+### Alph
+#### N/A
+Numéro de la route numérotée où l'accident est survenu.
 
-## Column name : BORNE_KM_ACCDN
-### Value type :
-#### Value examples :
-Borne kilométrique.
+## BORNE_KM_ACCDN
+### Num
+#### N/A
+Numéro de la borne kilométrique la plus proche de l'accident.
 
-## Column name : NB_METRE_DIST_ACCD
-### Value type :
-#### Value examples :
-Distance en mètres: Distance entre le lieu de l’accident et le renseignement inscrit dans la case du numéro civique, la case de la borne kilométrique ou la case du type de repère.
+## NB_METRE_DIST_ACCD
+### Num
+#### N/A
+Distance en mètres entre le lieu de l'accident et le repère ou numéro civique indiqué.
 
-## Column name : VITESSE_AUTOR
-### Value type :
-#### Value examples :
-Vitesse autorisée: Vitesse permise, en kilomètres/heure, par l’autorité compétente sur la route où est survenu l’accident.
+## VITESSE_AUTOR
+### Num
+#### N/A
+Vitesse maximale permise en km/h sur la route concernée.
 
-## Column name : TP_REPRR_ACCDN
-### Value type :
-#### Value examples :
-Type de repère:
+## TP_REPRR_ACCDN
+### Alph
+#### 1 (Intersection), 2 (Autre repère), 0 (Non précisé)
+Code du type de repère : Intersection, Autre repère, Non précisé.
 
-## Column name : CD_PNT_CDRNL_REPRR
-### Value type :
-#### Value examples :
-Code du point cardinal pour la distance du repère: L’accident est survenu au nord, au sud, à l’est ou à l’ouest du numéro d’immeuble, de la borne kilométrique, de l’intersection ou du repère.
+## CD_PNT_CDRNL_REPRR
+### Alph
+#### N, S, E, O
+Point cardinal situant l'accident par rapport au repère.
 
-## Column name : CD_PNT_CDRNL_ROUTE
-### Value type :
-#### Value examples :
-Direction de la route pour route numérotée dont les voies sont séparées.
+## CD_PNT_CDRNL_ROUTE
+### Alph
+#### N, S, E, O
+Direction attachée au numéro de la route pour les voies séparées.
 
-## Column name : CD_GENRE_ACCDN
-### Value type :
-#### Value examples :
-Genre d’accident. Sert à indiquer la nature de l’accident et le premier fait physique (impact).
+## CD_GENRE_ACCDN
+### Alph
+#### 31 (Collision avec véhicule), 32 (piéton), 40-54 (objet fixe), 71 (capotage)
+Nature de l'impact (ex: Collision avec véhicule, piéton, objet fixe, capotage).
 
-## Column name : CD_SIT_PRTCE_ACCDN
-### Value type :
-#### Value examples :
-Situation particulière survenue lors de l'accident
+## CD_SIT_PRTCE_ACCDN
+### Alph
+#### 1 (Déversement), 2 (Perte de chargement), 3 (Déneigement)
+Situations spéciales : Déversement, Perte de chargement, Déneigement.
 
-## Column name : CD_ETAT_SURFC
-### Value type :
-#### Value examples :
-État de la surface de roulement lors de l’accident.
+## CD_ETAT_SURFC
+### Alph
+#### 11 (Sèche), 12 (Mouillée), 16 (Enneigée), 18 (Glacée), 19 (Boueuse)
+Condition de la surface (ex: Sèche, Mouillée, Enneigée, Glacée, Boueuse).
 
-## Column name : CD_ECLRM
-### Value type :
-#### Value examples :
-Éclairement: Degré de clarté des lieux au moment de l’accident.
+## CD_ECLRM
+### Alph
+#### 1 (Jour), 2 (Demi-obscurité), 3 (Nuit éclairée), 4 (Nuit non éclairée)
+Niveau de luminosité : Jour, Demi-obscurité, Nuit éclairée, Nuit non éclairée.
 
-## Column name : CD_ENVRN_ACCDN
-### Value type :
-#### Value examples :
-Environnement: Activité dominante du secteur où l’accident s’est produit.
+## CD_ENVRN_ACCDN
+### Alph
+#### 1 (Scolaire), 2 (Résidentiel), 3 (Commercial), 5 (Rural)
+Activité dominante du secteur (ex: Scolaire, Résidentiel, Commercial, Rural).
 
-## Column name : CD_CATEG_ROUTE
-### Value type :
-#### Value examples :
-Catégorie de route sur laquelle le premier fait physique (impact) s’est produit.
+## CD_CATEG_ROUTE
+### Alph
+#### 11 (Autoroute), 12 (Route numérotée), 14 (Rue résidentielle), 21 (Stationnement)
+Type de route (ex: Autoroute, Route numérotée, Rue résidentielle, Stationnement).
 
-## Column name : CD_ETAT_CHASS
-### Value type :
-#### Value examples :
-État de la chaussée sur les lieux de l’accident et dans son entourage immédiat.
+## CD_ETAT_CHASS
+### Alph
+#### 1 (Bon état), 2 (En construction), 5 (Trous/nids-de-poule)
+État physique de la route : Bon état, En construction, Trous/nids-de-poule.
 
-## Column name : CD_ASPCT_ROUTE
-### Value type :
-#### Value examples :
-Aspect de la route sur le lieu de l’accident au moment de l’impact et dans son entourage immédiat.
+## CD_ASPCT_ROUTE
+### Alph
+#### 11 (Droit et plat), 13 (Droit en pente), 21 (Courbe et plat)
+Géométrie de la route (ex: Droit et plat, Droit en pente, Courbe et plat).
 
-## Column name : CD_LOCLN_ACCDN
-### Value type :
-#### Value examples :
-Localisation longitudinale (le long de la route) du premier fait physique (impact).
+## CD_LOCLN_ACCDN
+### Alph
+#### 32 (Intersection), 35 (Passage à niveau), 36 (Pont), 38 (Tunnel)
+Emplacement longitudinal (ex: Intersection, Passage à niveau, Pont, Tunnel).
 
-## Column name : CD_POSI_ACCDN
-### Value type :
-#### Value examples :
-Positionnement: Localisation transversale (à travers la route) du premier fait physique de l’accident (impact).
+## CD_POSI_ACCDN
+### Alph
+#### 1 (Voie réservée), 6 (Voie de circulation), 7 (Accotement), 9 (Trottoir)
+Localisation transversale (ex: Voie réservée, Voie de circulation, Accotement, Trottoir).
 
-## Column name : CD_CONFG_ROUTE
-### Value type :
-#### Value examples :
-Configuration de la route: Caractéristiques des voies.
+## CD_CONFG_ROUTE
+### Alph
+#### 1 (Sens unique), 2-3 (Deux sens), 4-5 (Séparée)
+Aménagement des voies : Sens unique, Deux sens, Séparée.
 
-## Column name : CD_ZON_TRAVX_ROUTR
-### Value type :
-#### Value examples :
-Indicateur de zone de travaux
+## CD_ZON_TRAVX_ROUTR
+### Alph
+#### 1 (Aux approches de la zone), 2 (Dans la zone)
+Indique si l'accident a eu lieu aux approches ou dans une zone de travaux.
 
-## Column name : CD_COND_METEO
-### Value type :
-#### Value examples :
-Conditions météorologiques: Conditions atmosphériques présentes lors de l’accident.
+## CD_COND_METEO
+### Alph
+#### 11 (Clair), 12 (Nuageux), 14 (Pluie), 17 (Neige), 19 (Verglas)
+Conditions Météorologiques. Conditions atmosphériques présentes lors de l’accident. (ex: Clair, Nuageux, Pluie, Neige, Verglas).
 
-## Column name : nb_automobile_camion_leger
-### Value type :
-#### Value examples :
-Nombre d'automobiles ou de camions légers impliqués dans l'accident
+## nb_automobile_camion_leger
+### Num
+#### N/A
+Nombre d'autos ou camions légers impliqués dans l'accident.
 
-## Column name : nb_camionLourd_tractRoutier
-### Value type :
-#### Value examples :
-Nombre de camions lourds ou de tracteurs routiers impliqués dans l'accident
+## nb_camionLourd_tractRoutier
+### Num
+#### N/A
+Nombre de véhicules lourds impliqués dans l'accident.
 
-## Column name : nb_outil_equipement
-### Value type :
-#### Value examples :
-Nombre de véhicules-outils ou d’équipements impliqués dans l'accident
+## nb_outil_equipement
+### Num
+#### N/A
+Nombre de véhicules-outils ou équipements impliqués dans l'accident.
 
-## Column name : nb_tous_autobus_minibus
-### Value type :
-#### Value examples :
-Nombre d'autobus, d'autobus scolaires ou de minibus impliqués dans l'accident
+## nb_tous_autobus_minibus
+### Num
+#### N/A
+Nombre d'autobus ou minibus (incluant scolaires) impliqués dans l'accident.
 
-## Column name : nb_bicyclette
-### Value type :
-#### Value examples :
-Nombre de bicyclettes impliquées dans l'accident
+## nb_bicyclette
+### Num
+#### N/A
+Nombre de vélos impliqués dans l'accident.
 
-## Column name : nb_cyclomoteur
-### Value type :
-#### Value examples :
-Nombre de cyclomoteurs impliqués dans l'accident
+## nb_cyclomoteur
+### Num
+#### N/A
+Nombre de cyclomoteurs impliqués dans l'accident.
 
-## Column name : nb_motocyclette
-### Value type :
-#### Value examples :
-Nombre de motocyclettes impliquées dans l'accident
+## nb_motocyclette
+### Num
+#### N/A
+Nombre de motos impliquées dans l'accident.
 
-## Column name : nb_taxi
-### Value type :
-#### Value examples :
-Nombre de taxis impliqués dans l'accident
+## nb_taxi
+### Num
+#### N/A
+Nombre de taxis impliqués dans l'accident.
 
-## Column name : nb_urgence
-### Value type :
-#### Value examples :
-Nombre de véhicules d’urgence impliqués dans l'accident
+## nb_urgence
+### Num
+#### N/A
+Nombre de véhicules d'urgence impliqués dans l'accident.
 
-## Column name : nb_motoneige
-### Value type :
-#### Value examples :
-Nombre de motoneiges impliquées dans l'accident
+## nb_motoneige
+### Num
+#### N/A
+Nombre de motoneiges impliquées dans l'accident.
 
-## Column name : nb_VHR
-### Value type :
-#### Value examples :
+## nb_VHR
+### Num
+#### N/A
 Nombre de VHR ou motocyclettes hors route impliqués dans l'accident
 
-## Column name : nb_autres_types
-### Value type :
-#### Value examples :
+## nb_autres_types
+### Num
+#### N/A
 Nombre de véhicules d’un autre type impliqués dans l'accident
-
-## Column name : nb_veh_non_precise
-### Value type :
-#### Value examples :
+## nb_veh_non_precise
+### Num
+#### N/A
 Nombre de véhicules de type non précisé impliqués dans l'accident
