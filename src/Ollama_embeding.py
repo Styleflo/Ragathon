@@ -44,7 +44,7 @@ headers_to_split_on = [
     ("#", "Dataset"),
     ("##", "Column Name"),
     ("###", "Data Type"),
-    ("####", "Énumération"),
+    ("####", "Value Examples"),
 ]
 
 markdown_splitter = MarkdownHeaderTextSplitter(
@@ -73,42 +73,51 @@ for key, info in datasets.items():
         )
 
 
-def retrieve(question: str, dataset_key: str):
-    collection = datasets[dataset_key]["collection"]
-    query_emb = embed(question)
-
-    results = collection.query(
-        query_embeddings=[query_emb],
-        n_results=3
-    )
-    result_with_metadata = []
-    for i in range(len(results["documents"][0])):
-        result_with_metadata.append({
-            "content": results["documents"][0][i],
-            "metadata": results["metadatas"][0][i]
-        })
-
-    return result_with_metadata
-
-
-def retrieve_all_datasets(question: str):
-    all_contexts = {}
+def retrieve_top_chunks_overall(question: str, top_k=10):
+    all_candidates = []
     for key in datasets.keys():
-        all_contexts[key] = ""
-        chunks = retrieve(question, key)
-        
-        if chunks:
-            for chunk in chunks:
+        collection = datasets[key]["collection"]
+        query_emb = embed(question)
+
+        results = collection.query(
+            query_embeddings=[query_emb],
+            n_results=top_k
+        )
+
+        for i in range(len(results["documents"][0])):
+            all_candidates.append({
+                "dataset": key,
+                "content": results["documents"][0][i],
+                "metadata": results["metadatas"][0][i],
+                "distance": results["distances"][0][i]
+            })
+
+    all_candidates.sort(key=lambda x: x["distance"])
+    top_k_chunks = all_candidates[:top_k]
+
+    context = build_context_dict(top_k_chunks)
+    return context
+
+
+def build_context_dict(top_k_chunks):
+    context = {}
+
+    if top_k_chunks:
+            for chunk in top_k_chunks:
                 meta = chunk["metadata"]
                 col = meta.get("Column Name", "Inconnue")
                 dtype = meta.get("Data Type", "N/A")
-                
-                all_contexts[key] += f"DATASET: {key}\n"
-                all_contexts[key] += f"- COLONNE: {col} | TYPE: {dtype}\n"
-                all_contexts[key] += f"- DESCRIPTION: {chunk['content']}\n"
-            all_contexts[key] += "\n"
-            
-    return all_contexts
+                examples = meta.get("Value Examples", "N/A")
+                key = chunk["dataset"]
+
+                if key not in context:
+                    context[key] = ""
+                context[key] += f"DATASET: {key}\n"
+                context[key] += f"- COLUMN: {col} | TYPE: {dtype}\n"
+                context[key] += f"- DESCRIPTION: {chunk['content']}\n"
+                context[key] += f"- EXAMPLES: {examples}\n"
+            context[key] += "\n"
+    return context
 
 
 def safe_json_loads(raw: str):
@@ -354,7 +363,7 @@ def explain_cross(
 def ask(question: str):
     global conversation_state
 
-    contexts = retrieve_all_datasets(question)
+    contexts = retrieve_top_chunks_overall(question)
 
     results = generate_pandas_with_dataset_selection(
         question,
