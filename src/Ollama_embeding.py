@@ -17,11 +17,23 @@ datasets = {
         "df": pd.read_csv("data/collisions_routieres.csv", low_memory=False),
         "collection": chromadb.PersistentClient(path="db_collisions_routieres").get_or_create_collection("collisions_routieres_rag"),
         "description_file": "desc/collisions_routieres.md"
+    },
+    "gtfs_stm": {
+        "df": pd.read_csv("data/gtfs_stm.csv", low_memory=False),
+        "collection": chromadb.PersistentClient(path="db_gtfs_stm").get_or_create_collection("gtfs_stm_rag"),
+        "description_file": "desc/gtfs_columns.md"
+    },
+    "meteo_montreal": {
+        "df": pd.read_csv("data/meteo_montreal.csv", low_memory=False),
+        "collection": chromadb.PersistentClient(path="db_meteo_montreal").get_or_create_collection("meteo_montreal_rag"),
+        "description_file": "desc/contexte_metier_meteo.md"
     }
 }
 
 df_requetes311 = datasets["requetes311"]["df"]
 df_collisions_routieres = datasets["collisions_routieres"]["df"]
+df_gtfs_columns = datasets["gtfs_stm"]["df"]
+df_meteo_montreal = datasets["meteo_montreal"]["df"]
 
 
 def embed(text: str):
@@ -69,16 +81,34 @@ def retrieve(question: str, dataset_key: str):
         query_embeddings=[query_emb],
         n_results=3
     )
+    result_with_metadata = []
+    for i in range(len(results["documents"][0])):
+        result_with_metadata.append({
+            "content": results["documents"][0][i],
+            "metadata": results["metadatas"][0][i]
+        })
 
-    return [doc for sublist in results["documents"] for doc in sublist]
+    return result_with_metadata
 
 
 def retrieve_all_datasets(question: str):
-    contexts = {}
+    all_contexts = {}
     for key in datasets.keys():
-        docs = retrieve(question, key)
-        contexts[key] = "\n\n".join(docs)
-    return contexts
+        all_contexts[key] = ""
+        chunks = retrieve(question, key)
+        
+        if chunks:
+            for chunk in chunks:
+                meta = chunk["metadata"]
+                col = meta.get("Column Name", "Inconnue")
+                dtype = meta.get("Data Type", "N/A")
+                
+                all_contexts[key] += f"DATASET: {key}\n"
+                all_contexts[key] += f"- COLONNE: {col} | TYPE: {dtype}\n"
+                all_contexts[key] += f"- DESCRIPTION: {chunk['content']}\n"
+            all_contexts[key] += "\n"
+            
+    return all_contexts
 
 
 def safe_json_loads(raw: str):
@@ -122,6 +152,16 @@ def generate_pandas_with_dataset_selection(
             "dataframe": "df_collisions_routieres",
             "columns": list(df_collisions_routieres.columns),
             "context": contexts.get("collisions_routieres", "")
+        },
+        "gtfs_stm": {
+            "dataframe": "df_gtfs_columns",
+            "columns": list(df_gtfs_columns.columns),
+            "context": contexts.get("gtfs_stm", "")
+        },
+        "meteo_montreal": {
+            "dataframe": "df_meteo_montreal",
+            "columns": list(df_meteo_montreal.columns),
+            "context": contexts.get("meteo_montreal", "")
         }
     }
 
@@ -197,7 +237,7 @@ def generate_pandas_with_dataset_selection(
         """
 
     print(prompt)
-    response = ollama.generate(model="gemma3:4b", prompt=prompt)
+    response = ollama.generate(model=LANGUAGE_MODEL, prompt=prompt)
     raw = response["response"].strip()
     print(raw)
 
@@ -307,7 +347,7 @@ def explain_cross(
         """
 
     print(prompt)
-    response = ollama.generate(model="gemma3:4b", prompt=prompt)
+    response = ollama.generate(model=LANGUAGE_MODEL, prompt=prompt)
     return response["response"]
 
 
