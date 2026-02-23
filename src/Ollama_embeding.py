@@ -5,7 +5,7 @@ import pandas as pd
 import json
 
 EMBEDDING_MODEL = "bge-m3"
-LANGUAGE_MODEL = "qwen2.5-coder"
+LANGUAGE_MODEL = "gemma3:4b"
 
 datasets = {
     "requetes311": {
@@ -30,21 +30,20 @@ datasets = {
     }
 }
 
-df_requetes311 = datasets["requetes311"]["df"]
-df_collisions_routieres = datasets["collisions_routieres"]["df"]
-df_gtfs_columns = datasets["gtfs_stm"]["df"]
-df_meteo_montreal = datasets["meteo_montreal"]["df"]
+requetes311 = datasets["requetes311"]["df"]
+collisions_routieres = datasets["collisions_routieres"]["df"]
+gtfs_columns = datasets["gtfs_stm"]["df"]
+meteo_montreal = datasets["meteo_montreal"]["df"]
 
 
 def embed(text: str):
     response = ollama.embed(model=EMBEDDING_MODEL, input=text)
     return response["embeddings"][0]
 
-headers_to_split_on = [
-    ("#", "Dataset"),
+headers_to_split_on=[ 
     ("##", "Column Name"),
-    ("###", "Data Type"),
-    ("####", "Value Examples"),
+    ("###", "Data Type"), 
+    ("####", "Value Examples"), 
 ]
 
 markdown_splitter = MarkdownHeaderTextSplitter(
@@ -65,6 +64,7 @@ for key, info in datasets.items():
     for i, chunk in enumerate(chunks):
         text_content = chunk.page_content
         metadata = chunk.metadata
+        metadata["Dataset"] = key
         collection.add(
             ids=[f"{key}_chunk_{i}"],
             documents=[text_content],
@@ -131,48 +131,16 @@ def safe_json_loads(raw: str):
         cleaned = cleaned.strip("`")
         if "\n" in cleaned:
             cleaned = cleaned.split("\n", 1)[1]
+    
+    return json.loads(cleaned)
 
-    try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
-        pass
 
-    try:
-        start = cleaned.index("{")
-        end = cleaned.rindex("}") + 1
-        return json.loads(cleaned[start:end])
-    except Exception:
-        print(raw)
-        raise ValueError("LLM returned invalid JSON and could not be recovered.")
     
 
 def generate_pandas_with_dataset_selection(
     question: str,
     contexts: dict,
 ):
-
-    datasets_block = {
-        "requetes311": {
-            "dataframe": "df_requetes311",
-            "columns": list(df_requetes311.columns),
-            "context": contexts.get("requetes311", "")
-        },
-        "collisions_routieres": {
-            "dataframe": "df_collisions_routieres",
-            "columns": list(df_collisions_routieres.columns),
-            "context": contexts.get("collisions_routieres", "")
-        },
-        "gtfs_stm": {
-            "dataframe": "df_gtfs_columns",
-            "columns": list(df_gtfs_columns.columns),
-            "context": contexts.get("gtfs_stm", "")
-        },
-        "meteo_montreal": {
-            "dataframe": "df_meteo_montreal",
-            "columns": list(df_meteo_montreal.columns),
-            "context": contexts.get("meteo_montreal", "")
-        }
-    }
 
     prompt = f"""
         You are a python/pandas query generator.
@@ -231,8 +199,8 @@ def generate_pandas_with_dataset_selection(
             3. For each dataset, explore ALL relevant columns.
             4. For each column, generate multiple queries covering different analytical angles.
 
-        You can use this context to guide your decisions:
-        {datasets_block}
+        Use this context to guide your decisions:
+        {contexts}
 
         Current user question:
         {question}
@@ -258,8 +226,10 @@ def execute_multi(code_map: dict):
     results = {}
 
     env = {
-        "df_requetes311": df_requetes311,
-        "df_collisions_routieres": df_collisions_routieres,
+        "requetes311": requetes311,
+        "collisions_routieres": collisions_routieres,
+        "gtfs_columns ": gtfs_columns ,
+        "meteo_montreal": meteo_montreal,
         "pd": pd,
     }
 
@@ -280,9 +250,6 @@ def explain_cross(
     results: dict,
     contexts: dict,
 ):
-
-
-
     prompt = f"""
         You are a data analyst that use data to answer questions.
 
@@ -372,8 +339,6 @@ def ask(question: str):
 
 
     results = execute_multi(results)
-    for k, v in results.items():
-        print(f"[{k}] ok={v['ok']}")
 
     answer = explain_cross(
         question,
@@ -383,7 +348,7 @@ def ask(question: str):
     return answer
 
 if __name__ == "__main__":
-    q1 = "quelle est le top 5 des locations des accidents de voiture et quelle est le top 5 des types de moyen de transport impliquer dans des accidents"
+    q1 = "quelle est le type le plus commun de requête 311 et quel est la location la plu commune de requete 311"
     print(ask(q1))
 
 
