@@ -1,0 +1,6 @@
+pandas~=2.3.3
+requests~=2.32.5
+streamlit~=1.54.0
+chromadb~=1.5.1
+ollama~=0.6.1
+langchain-text-splitters~=0.3.0
