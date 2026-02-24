@@ -148,6 +148,14 @@ def generate_pandas_with_dataset_selection(
         Your goal:
         Generate ALL pandas queries needed to fully answer the user’s question.
 
+        DATASET & COLUMN SOURCE OF TRUTH:
+            1. The `contexts` argument is a JSON-like dictionary.
+            2. Top-level keys of `contexts` are EXACT dataset names.
+            3. For each dataset, the only valid columns are the ones explicitly mentioned in its description text.
+            4. You MUST extract dataset names and column names ONLY from `contexts`.
+            5. The pandas variable name for a dataset is IDENTICAL to its key in `contexts`.
+               Example: dataset key "requetes311" → pandas variable `requetes311`.
+
         COLUMN FAMILY RULE:
             If the question refers to a category (e.g., “types of vehicles”, “types of transport”, “types of locations”, etc.), 
             you MUST identify ALL columns in the dataset that belong to that category.
@@ -164,14 +172,14 @@ def generate_pandas_with_dataset_selection(
         STRICT RULES:
             1. You may ONLY use the datasets and columns explicitly provided.
             2. You MUST NOT invent or guess column names.
-            3. You MUST NOT use a dataset if none of its columns relate to the question.
-            4. You MUST output ONLY a flat JSON dictionary:
-            {{
-                "dataset_query_1": "pandas_expression",
-                "dataset_query_2": "pandas_expression"
-            }}
-            5. Each value MUST be a single pandas expression.
-            6. You MUST NOT output lists, nested structures, explanations, or comments.
+            3. You MUST NOT invent or guess datasets names.
+            4. You MUST NOT use a dataset if none of its columns relate to the question.
+            5. You MUST use one of the provided dataset names, you CANNOT use df.
+            6. Column access MUST use bracket notation. Attribute access is forbidden.
+               Valid:   requetes311["NATURE"]
+               Invalid: requetes311.NATURE, df["NATURE"]
+            7. Each value MUST be a single pandas expression.
+            8. You MUST NOT output lists, nested structures, explanations, or comments.
 
         How to determine relevance:
             1. A dataset is relevant if ANY of its columns semantically match a concept in the question.
@@ -199,7 +207,7 @@ def generate_pandas_with_dataset_selection(
             3. For each dataset, explore ALL relevant columns.
             4. For each column, generate multiple queries covering different analytical angles.
 
-        Use this context to guide your decisions:
+        Use this context to determine columns and dataset for the queries:
         {contexts}
 
         Current user question:
