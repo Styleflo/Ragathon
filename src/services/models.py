@@ -1,0 +1,2 @@
+EMBEDDING_MODEL = "bge-m3"
+LANGUAGE_MODEL = "qwen2.5-coder"
