@@ -32,7 +32,7 @@ datasets = {
 
 requetes311 = datasets["requetes311"]["df"]
 collisions_routieres = datasets["collisions_routieres"]["df"]
-gtfs_columns = datasets["gtfs_stm"]["df"]
+gtfs_stm = datasets["gtfs_stm"]["df"]
 meteo_montreal = datasets["meteo_montreal"]["df"]
 
 
@@ -134,6 +134,39 @@ def safe_json_loads(raw: str):
     
     return json.loads(cleaned)
 
+def context_converter(contexts):
+    clean = {}
+
+    for dataset_name, messy_text in contexts.items():
+        clean[dataset_name] = {"columns": {}}
+        current_column = None
+
+        for line in messy_text.splitlines():
+            line = line.strip()
+
+            if line.startswith("- COLUMN:"):
+                if "Nom de la colonne" in line:
+                    col = line.split("Nom de la colonne")[-1].split("|")[0].replace(":", "").strip()
+                else:
+                    col = line.split("- COLUMN:")[1].split("|")[0].strip()
+
+                current_column = col
+                clean[dataset_name]["columns"][current_column] = {
+                    "description": "",
+                    "type": ""
+                }
+
+                if "| TYPE:" in line:
+                    clean[dataset_name]["columns"][current_column]["type"] = line.split("TYPE:")[1].strip()
+
+            elif line.startswith("- DESCRIPTION:") and current_column:
+                clean[dataset_name]["columns"][current_column]["description"] = line.split("- DESCRIPTION:")[1].strip()
+
+    return clean
+
+
+
+
 
     
 
@@ -145,81 +178,57 @@ def generate_pandas_with_dataset_selection(
     prompt = f"""
         You are a python/pandas query generator.
 
-        Your goal:
-        Generate ALL pandas queries needed to fully answer the user’s question.
+        Your job:
+        Generate pandas expressions that help answer the user's question, using ONLY the datasets and columns in `contexts`.
 
-        DATASET & COLUMN SOURCE OF TRUTH:
-            1. The `contexts` argument is a JSON-like dictionary.
-            2. Top-level keys of `contexts` are EXACT dataset names.
-            3. For each dataset, the only valid columns are the ones explicitly mentioned in its description text.
-            4. You MUST extract dataset names and column names ONLY from `contexts`.
-            5. The pandas variable name for a dataset is IDENTICAL to its key in `contexts`.
-               Example: dataset key "requetes311" → pandas variable `requetes311`.
+        MODES:
+        1. If the question clearly relates to specific columns, generate queries ONLY for those columns.
+        2. If the question is vague, general, or does not match any column, switch to EXPLORATORY MODE:
+        - Treat ALL datasets as relevant.
+        - Select several meaningful columns from each dataset.
+        - Generate exploratory queries for them.
 
-        COLUMN FAMILY RULE:
-            If the question refers to a category (e.g., “types of vehicles”, “types of transport”, “types of locations”, etc.), 
-            you MUST identify ALL columns in the dataset that belong to that category.
+        OUTPUT FORMAT (IMPORTANT):
+        - Output MUST be a FLAT JSON object.
+        - Each key MUST be a string.
+        - Each value MUST be a SINGLE pandas expression.
+        - Keys MUST follow this format: dataset_column_queryIndex
+        Example: meteo_montreal_Temp_moy_1
+        - Do NOT output nested JSON.
+        - Do NOT output lists.
+        - Do NOT output explanations or comments.
 
-            A column belongs to a category if:
-            - its name contains a shared prefix (e.g., nb_*)
-            - its description indicates it is part of the same conceptual group
-            - it measures a subtype of the same concept
+        RULES:
+        - Use ONLY dataset and column names from `contexts`.
+        - Pandas variable name = dataset name.
+        - Use bracket notation only: dataset["column"].
+        - Do NOT invent columns, datasets, or expressions.
 
-            For each column in the category, you MUST generate at least one query.
-            You MUST NOT invent aggregate columns (e.g., NB_VEH_IMPLIQUES_ACCDN).
-            You MUST enumerate each real column individually.
+        QUERY GENERATION:
+        For each selected column, generate 1–3 useful analytical queries:
+        - value_counts()
+        - describe()
+        - groupby() if meaningful
+        - comparisons or trends if numeric/time columns exist
 
-        STRICT RULES:
-            1. You may ONLY use the datasets and columns explicitly provided.
-            2. You MUST NOT invent or guess column names.
-            3. You MUST NOT invent or guess datasets names.
-            4. You MUST NOT use a dataset if none of its columns relate to the question.
-            5. You MUST use one of the provided dataset names, you CANNOT use df.
-            6. Column access MUST use bracket notation. Attribute access is forbidden.
-               Valid:   requetes311["NATURE"]
-               Invalid: requetes311.NATURE, df["NATURE"]
-            7. Each value MUST be a single pandas expression.
-            8. You MUST NOT output lists, nested structures, explanations, or comments.
+        CONTEXTS:
+        {json.dumps(contexts, indent=2, ensure_ascii=False)}
 
-        How to determine relevance:
-            1. A dataset is relevant if ANY of its columns semantically match a concept in the question.
-            2. A column is relevant if its meaning overlaps with a concept in the question.
-            3. If multiple columns match, you MUST generate one query PER COLUMN.
-            4. You MUST NOT stop after the first relevant column.
-
-        How to generate enough queries:
-        For EACH core component of the question:
-            1. Identify ALL relevant datasets.
-            2. Identify ALL relevant columns in those datasets.
-            3. For EACH relevant column, generate MULTIPLE analytical queries:
-            - distribution (value counts, top/bottom)
-            - grouping (e.g., by year, by arrondissement, by type)
-            - trends over time (if a time column exists)
-            - correlations (if multiple relevant numeric columns exist)
-            - comparisons (if multiple categories exist)
-            4. You MUST generate as many queries as needed to fully cover the question.
-            5. You MUST be exhaustive and thorough.
-            6. Do NOT stop at the simplest query.
-
-        Guide to operate:
-            1. Break the question into core components.
-            2. For each component, explore ALL relevant datasets.
-            3. For each dataset, explore ALL relevant columns.
-            4. For each column, generate multiple queries covering different analytical angles.
-
-        Use this context to determine columns and dataset for the queries:
-        {contexts}
-
-        Current user question:
+        QUESTION:
         {question}
 
-        Your output MUST follow this exact schema:
+        Output MUST be a flat JSON object of the form, but there are no limit to the number of entries the more the better:
         {{
-            "dataset_key_1_query_1": "pandas_expression",
-            "dataset_key_1_query_2": "pandas_expression",
-            "dataset_key_2_query_1": "pandas_expression"
+            "key1": "pandas_expression1"¨
+            "key2": "pandas_expression2"
+            "key3": "pandas_expression3"
+            "key4": "pandas_expression4"
+            "key5": "pandas_expression5"
         }}
-        """
+    """
+
+
+
 
     print(prompt)
     response = ollama.generate(model=LANGUAGE_MODEL, prompt=prompt)
@@ -236,7 +245,7 @@ def execute_multi(code_map: dict):
     env = {
         "requetes311": requetes311,
         "collisions_routieres": collisions_routieres,
-        "gtfs_columns ": gtfs_columns ,
+        "gtfs_stm ": gtfs_stm ,
         "meteo_montreal": meteo_montreal,
         "pd": pd,
     }
@@ -339,7 +348,7 @@ def ask(question: str):
     global conversation_state
 
     contexts = retrieve_top_chunks_overall(question)
-
+    contexts =context_converter(contexts)
     results = generate_pandas_with_dataset_selection(
         question,
         contexts,
@@ -356,7 +365,7 @@ def ask(question: str):
     return answer
 
 if __name__ == "__main__":
-    q1 = "quelle est le type le plus commun de requête 311 et quel est la location la plu commune de requete 311"
+    q1 = "quelle est le type de collision la plus commune top 5"
     print(ask(q1))
 
 
