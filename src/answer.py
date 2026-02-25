@@ -1,6 +1,7 @@
 import ollama
 from services.chunking_embeding import retrieve_top_chunks_overall, context_converter
 from services.sql_queries import generate_sql_with_dataset_selection
+from services.pandas_queries import generate_pandas_with_dataset_selection
 from services.models import LANGUAGE_MODEL
 from services.prompts import get_answer_prompt
 from config import DEBUG
