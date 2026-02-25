@@ -28,3 +28,13 @@ requetes311 = datasets["requetes311"]["df"]
 collisions_routieres = datasets["collisions_routieres"]["df"]
 gtfs_stm = datasets["gtfs_stm"]["df"]
 meteo_montreal = datasets["meteo_montreal"]["df"]
+
+def get_datasets_metadata():
+    result = {}
+    for name, info in datasets.items():
+        dataset = info["df"]
+        cols = dataset.columns.tolist()
+        result[name] = {"columns": cols}
+
+    return result
+

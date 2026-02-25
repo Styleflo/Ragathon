@@ -1,7 +1,7 @@
 import json
 import pandas as pd
 import ollama
-from services.prompts import get_pandas_prompt
+from services.prompts import get_pandas_prompt, get_pandas_prompt_top_5
 from services.models import LANGUAGE_MODEL
 from services.datasets_info import requetes311, collisions_routieres, gtfs_stm, meteo_montreal
 
@@ -21,15 +21,23 @@ def safe_json_loads(raw: str):
 
 
 def generate_pandas_with_dataset_selection(
-    question: str,
+    mode,
     contexts: dict,
+    question: str = None,
     tries = 1
 ):
-
-    prompt = get_pandas_prompt(
-        question,
-        contexts,
-    )
+    
+    prompt= None
+    match mode:
+        case "analytic":
+            prompt = get_pandas_prompt(
+                question,
+                contexts,
+            )
+        case "synthesis":
+            prompt = get_pandas_prompt_top_5(
+                contexts,
+            )
 
     print(prompt)
     response = ollama.generate(model=LANGUAGE_MODEL, prompt=prompt)
@@ -38,9 +46,9 @@ def generate_pandas_with_dataset_selection(
 
     json_pandas_output = safe_json_loads(raw)
 
-    return recursive_validator(json_pandas_output, question, contexts, tries)
+    return recursive_validator(json_pandas_output,mode, contexts, question, tries)
 
-def recursive_validator(json_pandas_output: dict, question, context, tries = 1):
+def recursive_validator(json_pandas_output: dict, mode, context, question = None, tries = 1):
     results = {}
 
     env = {
@@ -61,5 +69,6 @@ def recursive_validator(json_pandas_output: dict, question, context, tries = 1):
             if tries > 3:
                 results[key] = {"ok": False, "result": str(e), "code": code}
             else:
-                return generate_pandas_with_dataset_selection(question, context, tries)
+                print("request failed")
+                return generate_pandas_with_dataset_selection(mode, context, question, tries)
     return results
