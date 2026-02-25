@@ -89,5 +89,5 @@ Les derniers datasets sont à télécharger [ici](https://drive.google.com/drive
 ### Étape 7 : Lancer le projet
 ```bash
   cd ./src/frontend
-  streamlit run ui.py
+  streamlit run Copilot.py
 ```

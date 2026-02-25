@@ -7,7 +7,7 @@ import streamlit as st
 import uuid
 from answer import ask
 
-st.set_page_config(page_title="Mobility Copilot Montréal", layout="wide")
+st.set_page_config(page_title="Mobility Copilot Montréal", page_icon="🚗", layout="wide")
 st.title("🚗 Mobility Copilot - Montréal")
 
 if "conversations" not in st.session_state:
@@ -29,8 +29,6 @@ with st.sidebar:
         st.session_state.current_conv_id = new_id
         st.rerun()
     
-    st.divider()
-
     conv_ids = list(st.session_state.conversations.keys())
 
     for conv_id in conv_ids:
