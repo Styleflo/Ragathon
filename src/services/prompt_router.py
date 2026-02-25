@@ -3,11 +3,13 @@ from services.models import LANGUAGE_MODEL
 
 
 def classifier_requete(user_query):
-    # Prompt optimisé pour Gemma 3 (très direct)
     prompt = f"""
     Système: Tu es un classifieur d'intention ultra-rapide.
     Règles: 
-    - Réponds 'RAG' si la question demandé concerne la mobilité urbaine et la sécurité routière à Montréal.
+    - Réponds 'RAG' si la question demandé concerne:
+        * les collisions routières et accidents à Montréal.
+        * l'ensemble des spécifications techniques du flux GTFS de la Société de transport de Montréal (STM), détaillant les structures des tables (agences, arrêts, lignes, trajets et horaires) nécessaires à la modélisation complète du réseau de transport collectif.
+        * les requêtes et plaintes de la route géré par le service 311 de Montréal, détaillant la nature des requêtes (information, commentaire, requête ou plainte), leur provenance multicanale, leur localisation géographique et leur état de traitement.
     - Réponds 'CHAT' si c'est une salutation, un remerciement ou du bavardage ou tout autre question.
 
     Requête: "{user_query}"
@@ -18,9 +20,9 @@ def classifier_requete(user_query):
             model=LANGUAGE_MODEL,
             prompt=prompt,
             options={
-                "temperature": 0,  # Pour la stabilité
-                "num_predict": 5,  # Pour la vitesse (limite la réponse à 5 tokens)
-                "stop": ["\n"]  # S'arrête dès qu'il passe à la ligne
+                "temperature": 0,
+                "num_predict": 5,
+                "stop": ["\n"]
             }
         )
 
@@ -51,6 +53,7 @@ if __name__ == "__main__":
         "Liste les projets de rues partagées prévus pour cet été.",
         "Est-ce que le radar photo sur Notre-Dame est efficace ?",
         "Comment la ville sécurise-t-elle les zones scolaires ?",
+        "combien y a t il eu de requetes 311 en 2025 liée aux motos ?",
 
         # --- CATÉGORIE CHAT (Hors sujet ou bavardage) ---
         "Salut, tu peux m'aider ?",
