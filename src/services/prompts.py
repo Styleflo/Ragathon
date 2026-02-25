@@ -65,7 +65,7 @@ def get_answer_prompt(question: str, contexts: dict, results: dict):
             The data, this is you main source of informations:
             {results}
 
-            This is the question you must answer has precisely has possible :
+            This is the question you must answer as precisely as possible :
             {question}
 
             Constraint:

@@ -4,6 +4,7 @@ import ollama
 from services.prompts import get_pandas_prompt
 from services.models import LANGUAGE_MODEL
 from services.datasets_info import requetes311, collisions_routieres, gtfs_stm, meteo_montreal
+from config import DEBUG
 
 def safe_json_loads(raw: str):
 
@@ -31,10 +32,10 @@ def generate_pandas_with_dataset_selection(
         contexts,
     )
 
-    print(prompt)
+    if DEBUG : print(prompt)
     response = ollama.generate(model=LANGUAGE_MODEL, prompt=prompt)
     raw = response["response"].strip()
-    print(raw)
+    if DEBUG: print(raw)
 
     json_pandas_output = safe_json_loads(raw)
 
@@ -52,7 +53,7 @@ def recursive_validator(json_pandas_output: dict, question, context, tries = 1):
     }
 
     for key, code in json_pandas_output.items():
-        print(key, code)
+        if DEBUG: print(key, code)
         try:
             res = eval(code, env)
             results[key] = {"ok": True, "result": res, "code": code}

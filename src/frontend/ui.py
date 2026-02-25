@@ -1,5 +1,11 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import streamlit as st
 import uuid
+from answer import ask
 
 st.set_page_config(page_title="Mobility Copilot Montréal", layout="wide")
 st.title("🚗 Mobility Copilot - Montréal")
@@ -69,10 +75,10 @@ if user_query:
             st.markdown(user_query)
 
     with st.spinner("Analyse en cours..."):
-        # Simulation du moteur RAG + Pandas
-        model_response = f"Réponse simulée pour la conversation {st.session_state.current_conv_id[:4]} : '{user_query}'"
+        # Get conversation history for context
+        history = [(m["role"], m["content"]) for m in current_messages[:-1]]  # Exclude the just-added user message
+        model_response = ask(user_query, history)
         
-        # 3. Ajouter la réponse de l'assistant à la conversation active
         current_messages.append({"role": "assistant", "content": model_response})
         
         st.rerun()
