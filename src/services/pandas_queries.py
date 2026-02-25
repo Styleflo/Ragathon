@@ -61,5 +61,5 @@ def recursive_validator(json_pandas_output: dict, question, context, tries = 1):
             if tries > 3:
                 results[key] = {"ok": False, "result": str(e), "code": code}
             else:
-                results = generate_pandas_with_dataset_selection(question, context, tries)
+                return generate_pandas_with_dataset_selection(question, context, tries)
     return results
