@@ -1,6 +1,5 @@
 import ollama
 from services.chunking_embeding import retrieve_top_chunks_overall, context_converter
-from services.sql_queries import generate_sql_with_dataset_selection
 from services.pandas_queries import generate_pandas_with_dataset_selection
 from services.models import LANGUAGE_MODEL
 from services.prompts import get_answer_prompt
@@ -56,7 +55,7 @@ def ask(question: str, history: list[tuple[str, str]] = None):
         history = []
 
     contexts = retrieve_top_chunks_overall(question)
-    contexts =context_converter(contexts)
+    contexts = context_converter(contexts)
     results = generate_pandas_with_dataset_selection(
         question,
         contexts,
