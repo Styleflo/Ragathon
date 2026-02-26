@@ -26,9 +26,9 @@ def csv311_reload():
 
     if response.status_code == 200:
         csv_path.write_bytes(response.content)
-        print(f"✅ Fichier téléchargé avec succès → {csv_path}")
+        print(f"Fichier téléchargé avec succès : {csv_path}")
     else:
-        print("❌ Erreur :", response.status_code)
+        print("Erreur :", response.status_code)
 
 
 def download_weather_csv(station_id, start_year=2022):
