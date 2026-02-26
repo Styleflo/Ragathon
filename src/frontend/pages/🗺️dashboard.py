@@ -9,9 +9,10 @@ st.title("🗺️ Dashboard - Montréal")
 with st.sidebar:
     st.header("Période")
 
-    date_debut = str(st.date_input("Date de début", value=date(2015, 1, 1)))
-    date_fin = str(st.date_input("Date de fin", value=date.today()))
-
+    date_debut_object = st.date_input("Date de début", value=date(2015, 1, 1), min_value=date(2000, 1, 1), max_value=date.today())
+    date_fin_object = st.date_input("Date de fin", value=date.today(), min_value=date(2000, 1, 1), max_value=date.today())
+    date_debut = str(date_debut_object)
+    date_fin = str(date_fin_object)
 
     # Remplacer par les fonctions qui génèrent les graphiques en fonction des dates sélectionnées
     if "html_code_1" not in st.session_state:
@@ -67,7 +68,10 @@ with st.container():
 st.divider()
 
 with st.container():
-    st.subheader("Graphique 4") #Titre a modifier
+    if (date_fin_object - date_debut_object).days > 365:
+        st.subheader("Nombre d'accidents par mois")
+    else:
+        st.subheader("Nombre d'accidents par jours")
     st.caption("Description du graphique 4.") # Description a modifier
     if st.session_state.fig_4 == "None":
         st.warning("Aucune donnée disponible pour la période sélectionnée.")

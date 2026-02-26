@@ -80,8 +80,9 @@ def correlation_meteo_incident(date_debut='2020-01-01', date_fin='2021-03-31'):
     data_plot = data_plot.dropna(subset=["CD_COND_METEO", "GRAVITE"])
 
     data_plot = data_plot[(data_plot['DT_ACCDN'] >= date_debut) & (data_plot['DT_ACCDN'] <= date_fin)]
+
     if data_plot.empty:
-        return None
+        return "None"
 
     data_plot["CD_COND_METEO"] = data_plot["CD_COND_METEO"].astype(float).astype(int).astype(str)
     data_plot['Etat_meteo_Label'] = data_plot['CD_COND_METEO'].map(etat_meteo_map)
