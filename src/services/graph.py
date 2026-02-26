@@ -108,4 +108,3 @@ def correlation_meteo_incident(date_debut = '2020-01-01', date_fin = '2021-03-31
     fig.tight_layout()
 
     return fig
-

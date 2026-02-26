@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import date
 import streamlit.components.v1 as components
-from services.graph import heatmap_collisions_filtree
+from services.graph import heatmap_collisions_filtree, correlation_meteo_incident, nuage_point_311
 
 st.set_page_config(page_title=" Dashboard - Montréal", page_icon="🗺️", layout="wide")
 st.title("🗺️ Dashboard - Montréal")
@@ -16,8 +16,8 @@ with st.sidebar:
     # Remplacer par les fonctions qui génèrent les graphiques en fonction des dates sélectionnées
     if "html_code_1" not in st.session_state:
         st.session_state.html_code_1 = heatmap_collisions_filtree(date_debut, date_fin)
-        st.session_state.html_code_2 = heatmap_collisions_filtree(date_debut, date_fin)
-        st.session_state.fig_3 = heatmap_collisions_filtree(date_debut, date_fin)
+        st.session_state.html_code_2 = nuage_point_311(date_debut, date_fin)
+        st.session_state.fig_3 = correlation_meteo_incident(date_debut, date_fin)
         st.session_state.html_code_4 = heatmap_collisions_filtree(date_debut, date_fin)
 
     is_valid_date = date_debut > date_fin
@@ -30,8 +30,8 @@ with st.sidebar:
 
         # Remplacer par les fonctions qui génèrent les graphiques en fonction des dates sélectionnées
         st.session_state.html_code_1 = heatmap_collisions_filtree(date_debut, date_fin)
-        st.session_state.html_code_2 = heatmap_collisions_filtree(date_debut, date_fin)
-        st.session_state.fig_3 = heatmap_collisions_filtree(date_debut, date_fin)
+        st.session_state.html_code_2 = nuage_point_311(date_debut, date_fin)
+        st.session_state.fig_3 = correlation_meteo_incident(date_debut, date_fin)
         st.session_state.html_code_4 = heatmap_collisions_filtree(date_debut, date_fin)
 
         st.rerun()
@@ -62,7 +62,7 @@ with st.container():
     if st.session_state.fig_3 == "None":
         st.warning("Aucune donnée disponible pour la période sélectionnée.")
     else:
-        st.pyplot(st.session_state.fig_3, height=500)
+        st.pyplot(st.session_state.fig_3)
 
 st.divider()
 
