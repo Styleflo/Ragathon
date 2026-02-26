@@ -57,7 +57,7 @@ with st.container():
 st.divider()
 
 with st.container():
-    st.subheader("Graphique 3") #Titre a modifier
+    st.subheader("Répartition (%) de la Gravité selon la Météo")
     st.caption("Description du graphique 3.") # Description a modifier
     if st.session_state.fig_3 == "None":
         st.warning("Aucune donnée disponible pour la période sélectionnée.")

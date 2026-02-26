@@ -20,10 +20,15 @@ def heatmap_collisions_filtree(date_debut='2020-01-01', date_fin='2020-03-31'):
         return "None"
 
     montreal_coords = [45.5017, -73.5673]
-    m2 = folium.Map(location=montreal_coords, zoom_start=11)
+    m2 = folium.Map(location=montreal_coords, tiles="cartodb positron", zoom_start=11)
 
     heat_data2 = data_clean2[['LOC_LAT', 'LOC_LONG']].values.tolist()
-    HeatMap(heat_data2, radius=10, blur=15, min_opacity=0.5).add_to(m2)
+    HeatMap(heat_data2,
+            radius=8,  # Réduit légèrement pour plus de précision
+            blur=12,  # Réduit le halo autour des points
+            min_opacity=0.3,  # Rend les zones isolées plus transparentes
+            max_zoom=13,  # TRÈS IMPORTANT : définit le zoom où l'intensité est maximale
+            ).add_to(m2)
 
     return m2._repr_html_()
 
@@ -43,7 +48,7 @@ def nuage_point_311(date_debut='2020-01-01', date_fin='2020-03-31'):
 
     data_list = data_sample[['LOC_LAT', 'LOC_LONG', 'ACTI_NOM']].values.tolist()
 
-    m_nuage = folium.Map(location=[45.5017, -73.5673], zoom_start=11)
+    m_nuage = folium.Map(location=[45.5017, -73.5673], tiles="cartodb positron", zoom_start=11)
 
     callback = """
         function (row) {
@@ -65,41 +70,56 @@ def nuage_point_311(date_debut='2020-01-01', date_fin='2020-03-31'):
 
     return m_nuage._repr_html_()
 
-def correlation_meteo_incident(date_debut = '2020-01-01', date_fin = '2021-03-31'):
 
-    etat_meteo_map = {'11': 'Clair', '13': 'Brouillard', '14': 'Pluie', '17': 'Neige', '18': 'Poudrerie', '19': 'Verglas'}
+def correlation_meteo_incident(date_debut='2020-01-01', date_fin='2021-03-31'):
+    etat_meteo_map = {'11': 'Clair', '13': 'Brouillard', '14': 'Pluie', '17': 'Neige', '18': 'Poudrerie',
+                      '19': 'Verglas'}
 
     data_plot = collisions_routieres.copy()
+    data_plot['DT_ACCDN'] = pd.to_datetime(data_plot['DT_ACCDN'])
     data_plot = data_plot.dropna(subset=["CD_COND_METEO", "GRAVITE"])
 
     data_plot = data_plot[(data_plot['DT_ACCDN'] >= date_debut) & (data_plot['DT_ACCDN'] <= date_fin)]
     if data_plot.empty:
-        return "None"
+        return None
 
     data_plot["CD_COND_METEO"] = data_plot["CD_COND_METEO"].astype(float).astype(int).astype(str)
     data_plot['Etat_meteo_Label'] = data_plot['CD_COND_METEO'].map(etat_meteo_map)
-
     data_plot = data_plot.dropna(subset=["Etat_meteo_Label"])
-
 
     ct = pd.crosstab(data_plot['Etat_meteo_Label'], data_plot['GRAVITE'], normalize='index') * 100
     ordre_meteo = ['Clair', 'Brouillard', 'Pluie', 'Neige', 'Poudrerie', 'Verglas']
     ct = ct.reindex(ordre_meteo)
 
-    fig, ax = plt.subplots(figsize=(12, 7))
+    # Création de la figure avec fond transparent
+    fig, ax = plt.subplots(figsize=(12, 7), facecolor='none')
+    ax.set_facecolor('none')  # Fond de l'axe transparent
 
-    # On passe l'objet 'ax' au plot de pandas
-    ct.plot(kind='bar', stacked=True, colormap='magma', width=0.8, ax=ax)
+    # Plot
+    ct.plot(kind='bar', stacked=True, colormap='viridis', width=0.8, ax=ax)
 
-    ax.set_title('Répartition (%) de la Gravité selon la Météo', fontsize=15, pad=20)
-    ax.set_xlabel('Condition météo', fontsize=12)
-    ax.set_ylabel("Pourcentage d'accidents (%)", fontsize=12)
-    ax.set_ylim(0, 110)
-    plt.xticks(rotation=0)  # Fonctionne toujours ou utiliser ax.set_xticklabels
+    # --- STYLE NOIR ET BLANC (TEXTES) ---
+    couleur_texte = 'white'
 
-    ax.legend(title='Gravité', bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax.set_xlabel('Condition météo', fontsize=12, color=couleur_texte)
+    ax.set_ylabel("Pourcentage d'accidents (%)", fontsize=12, color=couleur_texte)
 
-    # Annotation (inchangé mais utilise ax.patches)
+    # Ajustement des axes (couleurs des chiffres et des bordures)
+    ax.tick_params(axis='x', colors=couleur_texte, labelsize=10)
+    ax.tick_params(axis='y', colors=couleur_texte)
+
+    # Rendre les bordures de l'encadré (spines) invisibles ou blanches
+    for spine in ax.spines.values():
+        spine.set_edgecolor(couleur_texte)
+        # spine.set_visible(False) # Optionnel : masquer complètement les bordures
+
+    # Légende en blanc avec fond transparent
+    legend = ax.legend(title='Gravité', bbox_to_anchor=(1.05, 1), loc='upper left',
+                       facecolor='none', edgecolor=couleur_texte)
+    plt.setp(legend.get_texts(), color=couleur_texte)
+    plt.setp(legend.get_title(), color=couleur_texte)
+
+    # Annotations
     for p in ax.patches:
         height = p.get_height()
         if height > 5:
@@ -107,6 +127,7 @@ def correlation_meteo_incident(date_debut = '2020-01-01', date_fin = '2021-03-31
             ax.annotate(f'{height:.1f}%', (x + p.get_width() / 2, y + height / 2),
                         ha='center', va='center', fontsize=9, color='white', fontweight='bold')
 
+    plt.xticks(rotation=0)
     fig.tight_layout()
 
     return fig
@@ -124,6 +145,9 @@ def accidents_histogramme(date_debut, date_fin):
 
     data_filtered = data_collision[(data_collision['DT_ACCDN'] >= date_debut) &
                                    (data_collision['DT_ACCDN'] <= date_fin)]
+
+    if data_filtered.empty:
+        return "None"
 
     if plus_un_an:
         accidents_groupe = data_filtered.groupby(pd.Grouper(key='DT_ACCDN', freq='MS')).size().reset_index()
