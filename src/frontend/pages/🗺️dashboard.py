@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import date
 import streamlit.components.v1 as components
-from services.graph import heatmap_collisions_filtree, correlation_meteo_incident, nuage_point_311
+from services.graph import heatmap_collisions_filtree, correlation_meteo_incident, nuage_point_311, accidents_histogramme
 
 st.set_page_config(page_title=" Dashboard - Montréal", page_icon="🗺️", layout="wide")
 st.title("🗺️ Dashboard - Montréal")
@@ -18,7 +18,7 @@ with st.sidebar:
         st.session_state.html_code_1 = heatmap_collisions_filtree(date_debut, date_fin)
         st.session_state.html_code_2 = nuage_point_311(date_debut, date_fin)
         st.session_state.fig_3 = correlation_meteo_incident(date_debut, date_fin)
-        st.session_state.html_code_4 = heatmap_collisions_filtree(date_debut, date_fin)
+        st.session_state.fig_4 = accidents_histogramme(date_debut, date_fin)
 
     is_valid_date = date_debut > date_fin
     if is_valid_date:
@@ -32,7 +32,7 @@ with st.sidebar:
         st.session_state.html_code_1 = heatmap_collisions_filtree(date_debut, date_fin)
         st.session_state.html_code_2 = nuage_point_311(date_debut, date_fin)
         st.session_state.fig_3 = correlation_meteo_incident(date_debut, date_fin)
-        st.session_state.html_code_4 = heatmap_collisions_filtree(date_debut, date_fin)
+        st.session_state.fig_4 = accidents_histogramme(date_debut, date_fin)
 
         st.rerun()
 
@@ -69,9 +69,9 @@ st.divider()
 with st.container():
     st.subheader("Graphique 4") #Titre a modifier
     st.caption("Description du graphique 4.") # Description a modifier
-    if st.session_state.html_code_4 == "None":
+    if st.session_state.fig_4 == "None":
         st.warning("Aucune donnée disponible pour la période sélectionnée.")
     else:
-        components.html(st.session_state.html_code_4, height=500)
+        st.plotly_chart(st.session_state.fig_4)
 
 st.divider()

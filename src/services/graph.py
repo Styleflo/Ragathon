@@ -2,6 +2,7 @@ from services.datasets_info import requetes311, collisions_routieres
 from folium.plugins import FastMarkerCluster
 from folium.plugins import HeatMap
 import matplotlib.pyplot as plt
+import plotly.express as px
 import pandas as pd
 import folium
 
@@ -13,15 +14,14 @@ def heatmap_collisions_filtree(date_debut='2020-01-01', date_fin='2020-03-31'):
     data_filtered = data_collision[(data_collision['DT_ACCDN'] >= date_debut) &
                                    (data_collision['DT_ACCDN'] <= date_fin)]
 
-    # 3. Nettoyage des données filtrées
-    # On retire les lignes où les coordonnées sont manquantes
     data_clean2 = data_filtered.dropna(subset=['LOC_LAT', 'LOC_LONG'])
 
-    # 4. Initialisation de la carte centrée sur Montréal
+    if data_clean2.empty:
+        return "None"
+
     montreal_coords = [45.5017, -73.5673]
     m2 = folium.Map(location=montreal_coords, zoom_start=11)
 
-    # 5. Préparation et ajout de la Heatmap
     heat_data2 = data_clean2[['LOC_LAT', 'LOC_LONG']].values.tolist()
     HeatMap(heat_data2, radius=10, blur=15, min_opacity=0.5).add_to(m2)
 
@@ -36,8 +36,10 @@ def nuage_point_311(date_debut='2020-01-01', date_fin='2020-03-31'):
         (data_sample["DDS_DATE_CREATION"] >= date_debut) &
         (data_sample["DDS_DATE_CREATION"] <= date_fin)]
 
-    if not data_sample.empty:
-        data_sample = data_sample.sample(n=30000)
+    if data_sample.empty:
+        return "None"
+
+    data_sample = data_sample.sample(n=30000)
 
     data_list = data_sample[['LOC_LAT', 'LOC_LONG', 'ACTI_NOM']].values.tolist()
 
@@ -106,5 +108,60 @@ def correlation_meteo_incident(date_debut = '2020-01-01', date_fin = '2021-03-31
                         ha='center', va='center', fontsize=9, color='white', fontweight='bold')
 
     fig.tight_layout()
+
+    return fig
+
+def accidents_histogramme(date_debut, date_fin):
+
+    d_deb = pd.to_datetime(date_debut)
+    d_fin = pd.to_datetime(date_fin)
+
+    delta = d_fin - d_deb
+    plus_un_an = delta.days > 365
+
+    data_collision = collisions_routieres.copy()
+    data_collision['DT_ACCDN'] = pd.to_datetime(data_collision['DT_ACCDN'])
+
+    data_filtered = data_collision[(data_collision['DT_ACCDN'] >= date_debut) &
+                                   (data_collision['DT_ACCDN'] <= date_fin)]
+
+    if plus_un_an:
+        accidents_groupe = data_filtered.groupby(pd.Grouper(key='DT_ACCDN', freq='MS')).size().reset_index()
+        label_x = 'Mois'
+        hover_format = "<b>Mois:</b> %{x|%B %Y}<br><b>Accidents:</b> %{y}<extra></extra>"
+
+    else:
+        accidents_groupe = data_filtered.groupby(data_filtered['DT_ACCDN'].dt.date).size().reset_index()
+        label_x = 'Jour'
+        hover_format = "<b>Date:</b> %{x}<br><b>Accidents:</b> %{y}<extra></extra>"
+
+    accidents_groupe.columns = ['Date', 'Nombre']
+
+    fig = px.bar(
+        accidents_groupe,
+        x='Date',
+        y='Nombre',
+        labels={'Nombre': 'Accidents', 'Date': label_x},
+        color_discrete_sequence=['white']
+    )
+
+    fig.update_layout(
+        xaxis={
+            'showticklabels': False,  # Cache les dates (01-01, etc.)
+            'title': {'text': label_x},  # Force le titre "Jour" en bas
+            'fixedrange': True  # Empêche le zoom accidentel sur l'axe X
+        },
+        yaxis={'fixedrange': True},
+        hovermode="x unified",
+        template="plotly_white",
+        # Augmentation de la marge 'b' (bottom) pour ne pas couper le titre
+        margin=dict(l=40, r=20, t=60, b=60),
+        height=450  # Hauteur fixe pour éviter les sauts dans Streamlit
+    )
+
+    # Configuration de l'infobulle
+    fig.update_traces(
+        hovertemplate="<b>Date:</b> %{x}<br><b>Accidents:</b> %{y}<extra></extra>"
+    )
 
     return fig
