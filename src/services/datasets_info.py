@@ -91,3 +91,12 @@ stop_times = datasets["stop_times"]["df"]
 stops = datasets["stops"]["df"]
 trips = datasets["trips"]["df"]
 translations = datasets["translations"]["df"]
+
+def get_datasets_metadata():
+    result = {}
+    for name, info in datasets.items():
+        dataset = info["df"]
+        cols = dataset.columns.tolist()
+        result[name] = {"columns": cols}
+
+    return result
