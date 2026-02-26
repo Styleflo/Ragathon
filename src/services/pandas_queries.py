@@ -3,7 +3,7 @@ import pandas as pd
 import ollama
 from services.prompts import get_pandas_prompt
 from services.models import LANGUAGE_MODEL
-from services.datasets_info import requetes311, collisions_routieres, gtfs_stm, meteo_montreal
+from services.datasets_info import requetes311, collisions_routieres, meteo_montreal, agency, calendar, calendar_dates, feed_info, routes, shapes, stop_times, stops, trips, translations
 from config import DEBUG
 
 def safe_json_loads(raw: str):
@@ -47,8 +47,17 @@ def recursive_validator(json_pandas_output: dict, question, context, tries = 1):
     env = {
         "requetes311": requetes311,
         "collisions_routieres": collisions_routieres,
-        "gtfs_stm": gtfs_stm,
         "meteo_montreal": meteo_montreal,
+        "agency": agency,
+        "calendar": calendar,
+        "calendar_dates": calendar_dates,
+        "feed_info": feed_info,
+        "routes": routes,
+        "shapes": shapes,
+        "stop_times": stop_times,
+        "stops": stops,
+        "trips": trips,
+        "translations": translations,
         "pd": pd,
     }
 
