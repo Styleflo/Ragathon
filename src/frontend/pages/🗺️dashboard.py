@@ -39,27 +39,39 @@ with st.sidebar:
 with st.container():
     st.subheader("Heatmap des collisions")
     st.caption("Répartition des collisions à Montréal en fonction de la période sélectionnée.")
-    components.html(st.session_state.html_code_1, height=500)
+    if st.session_state.html_code_1 == "None":
+        st.warning("Aucune donnée disponible pour la période sélectionnée.")
+    else:
+        components.html(st.session_state.html_code_1, height=500)
 
 st.divider() 
 
 with st.container():
     st.subheader("Graphique 2") #Titre a modifier
     st.caption("Description du graphique 2.") # Description a modifier
-    components.html(st.session_state.html_code_2, height=500)
+    if st.session_state.html_code_2 == "None":
+        st.warning("Aucune donnée disponible pour la période sélectionnée.")
+    else:
+        components.html(st.session_state.html_code_2, height=500)
 
 st.divider()
 
 with st.container():
     st.subheader("Graphique 3") #Titre a modifier
     st.caption("Description du graphique 3.") # Description a modifier
-    components.html(st.session_state.html_code_3, height=500)
+    if st.session_state.html_code_3 == "None":
+        st.warning("Aucune donnée disponible pour la période sélectionnée.")
+    else:
+        components.html(st.session_state.html_code_3, height=500)
 
 st.divider()
 
 with st.container():
     st.subheader("Graphique 4") #Titre a modifier
     st.caption("Description du graphique 4.") # Description a modifier
-    components.html(st.session_state.html_code_4, height=500)
+    if st.session_state.html_code_4 == "None":
+        st.warning("Aucune donnée disponible pour la période sélectionnée.")
+    else:
+        components.html(st.session_state.html_code_4, height=500)
 
 st.divider()
