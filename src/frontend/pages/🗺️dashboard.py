@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import date
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title=" Dashboard - Montréal", page_icon="🗺️", layout="wide")
 st.title("🗺️ Dashboard - Montréal")
@@ -34,21 +35,28 @@ col1, col2 = st.columns(2)
 with col1:
     with st.container():
         st.subheader("Heatmap des collisions")  
-        st.line_chart([1,2,3], height=200)
-
+        html_code = """
+        """
+        components.html(html_code, height=200)  
 with col2:
     with st.container():
         st.subheader("Graphique 2") #Titre a modifier
-        st.bar_chart([3,2,1], height=200)
+        html_code = """
+        """
+        components.html(html_code, height=200)
 
 col3, col4 = st.columns(2)
 
 with col3:
     with st.container():
         st.subheader("Graphique 3") #Titre a modifier
-        st.line_chart([1,2,3], height=200)
+        html_code = """
+        """
+        components.html(html_code, height=200)
 
 with col4:
     with st.container():
         st.subheader("Graphique 4") #Titre a modifier
-        st.bar_chart([3,2,1], height=200)
+        html_code = """
+        """
+        components.html(html_code, height=200)
