@@ -36,26 +36,30 @@ with st.sidebar:
 
         st.rerun()
 
-# col1, col2 = st.columns(2)
-
-# with col1:
 with st.container():
     st.subheader("Heatmap des collisions")
+    st.caption("Répartition des collisions à Montréal en fonction de la période sélectionnée.")
     components.html(st.session_state.html_code_1, height=500)
 
-# with col2:
+st.divider() 
+
 with st.container():
     st.subheader("Graphique 2") #Titre a modifier
+    st.caption("Description du graphique 2.") # Description a modifier
     components.html(st.session_state.html_code_2, height=500)
 
-# col3, col4 = st.columns(2)
+st.divider()
 
-# with col3:
 with st.container():
     st.subheader("Graphique 3") #Titre a modifier
+    st.caption("Description du graphique 3.") # Description a modifier
     components.html(st.session_state.html_code_3, height=500)
 
-# with col4:
+st.divider()
+
 with st.container():
     st.subheader("Graphique 4") #Titre a modifier
+    st.caption("Description du graphique 4.") # Description a modifier
     components.html(st.session_state.html_code_4, height=500)
+
+st.divider()
