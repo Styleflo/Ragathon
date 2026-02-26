@@ -232,7 +232,7 @@ Indique si l'accident a eu lieu aux approches ou dans une zone de travaux.
 
 ## CD_COND_METEO
 ### Alph
-#### 11 (Clair), 12 (Nuageux), 14 (Pluie), 17 (Neige), 19 (Verglas)
+#### 11 (Clair), 12 (Nuageux), 13 (Brouillard/Brume), 14 (Pluie), 15 (Pluie forte), 16 (Vent fort), 17 (Neige), 18 (Poudrerie) 19 (Verglas), 99 (Autre)
 Conditions Météorologiques. Conditions atmosphériques présentes lors de l’accident. (ex: Clair, Nuageux, Pluie, Neige, Verglas).
 
 ## nb_automobile_camion_leger
