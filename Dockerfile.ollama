@@ -1,0 +1,12 @@
+# On part de l'image officielle
+FROM ollama/ollama:latest
+
+# On lance le serveur Ollama en arrière-plan, on attend qu'il soit prêt,
+# puis on télécharge les modèles demandés.
+RUN nohup bash -c "ollama serve &" && \
+    sleep 5 && \
+    ollama pull gemma3:4b && \
+    ollama pull bge-m3
+
+# Le port par défaut d'Ollama
+EXPOSE 11434
