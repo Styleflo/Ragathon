@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import date
 import streamlit.components.v1 as components
-from services.graph import heatmap_collisions_filtree
+from services.graph import heatmap_collisions_filtree, nuage_point_311, collisions_routieres
 
 st.set_page_config(page_title=" Dashboard - Montréal", page_icon="🗺️", layout="wide")
 st.title("🗺️ Dashboard - Montréal")
@@ -16,7 +16,7 @@ with st.sidebar:
     # Remplacer par les fonctions qui génèrent les graphiques en fonction des dates sélectionnées
     if "html_code_1" not in st.session_state:
         st.session_state.html_code_1 = heatmap_collisions_filtree(date_debut, date_fin)
-        st.session_state.html_code_2 = heatmap_collisions_filtree(date_debut, date_fin)
+        st.session_state.html_code_2 = nuage_point_311(date_debut, date_fin)
         st.session_state.html_code_3 = heatmap_collisions_filtree(date_debut, date_fin)
         st.session_state.html_code_4 = heatmap_collisions_filtree(date_debut, date_fin)
 
@@ -30,7 +30,7 @@ with st.sidebar:
 
         # Remplacer par les fonctions qui génèrent les graphiques en fonction des dates sélectionnées
         st.session_state.html_code_1 = heatmap_collisions_filtree(date_debut, date_fin)
-        st.session_state.html_code_2 = heatmap_collisions_filtree(date_debut, date_fin)
+        st.session_state.html_code_2 = nuage_point_311(date_debut, date_fin)
         st.session_state.html_code_3 = heatmap_collisions_filtree(date_debut, date_fin)
         st.session_state.html_code_4 = heatmap_collisions_filtree(date_debut, date_fin)
 
@@ -45,10 +45,9 @@ with st.container():
 
 # with col2:
 with st.container():
-    st.subheader("Graphique 2") #Titre a modifier
+    st.subheader("Nuage de points des requêtes 311")
     components.html(st.session_state.html_code_2, height=500)
 
-# col3, col4 = st.columns(2)
 
 # with col3:
 with st.container():
