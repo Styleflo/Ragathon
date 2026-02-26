@@ -77,12 +77,12 @@ def main() -> int:
     ap.add_argument("--url", default=DEFAULT_URL, help="URL du zip GTFS")
     ap.add_argument(
         "--out-dir",
-        default="src/data/",
+        default="../../src/data/",
         help="Dossier cible où copier les .txt (créé si absent)",
     )
     ap.add_argument(
         "--cache-zip",
-        default="src/data/_cache/gtfs_stm.zip",
+        default="../../src/data/_cache/gtfs_stm.zip",
         help="Chemin local pour stocker le zip téléchargé",
     )
     ap.add_argument(
