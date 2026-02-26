@@ -136,7 +136,7 @@ def get_answer_prompt(question: str, contexts: dict, results: dict):
             """
     return get_answer_prompt
 
-def get_answer_prompt_top_5(contexts: dict, results: dict):
+def get_answer_prompt_top_5(contexts: dict, results: dict, tone = "grand public"):
     get_answer_prompt = f"""
             you are a synthesis generator.
 
@@ -146,19 +146,18 @@ def get_answer_prompt_top_5(contexts: dict, results: dict):
             The data, this is you main source of informations:
             {results}
 
-            You must create has many pertinent synthesis output as possible
-
             Constraint:
             1. You MUST NOT invent number in your answer, only use the ones present in the provided data.
             3. Answer in french
             4. If the data is irrelevant and you cant answer properly you must say so.
             5. Do not use the columns names and data names directly in the answer, use descriptions.
-            
+            6. You MUST return a markdown text with the following format.
+
             Your task :
 
             ### Analyse
 
-            Here are example of questions and the type of answer expected, chose the proper format accodingly
+            Here are example of questions and the type of answer expected, choose the proper format accodingly
 
             this is your guideline to guide you:
 
@@ -167,11 +166,10 @@ def get_answer_prompt_top_5(contexts: dict, results: dict):
                     o top 5 hotspots, tendances, signaux faibles 
                     o recommandations (p. ex. : ciblage de déneigement, signalisation, 
                     inspection) 
-                • Version grand public vs municipalité (2 tons, même fondement data). 
-                    Plus précisément, … 
-                    Top 5 hotspots 
-                    Les 5 endroits (ou zones) où le problème est le plus concentré, selon un critère 
-                    clair. 
+                • Voici le ton que tu dois adopter : {tone}
+            Top 5 hotspots 
+            Les 5 endroits (ou zones) où le problème est le plus concentré, selon un critère 
+            clair. 
                 • Exemples de critères : 
                     o Collisions : intersections / segments de rue avec le plus de collisions 
                     (ou collisions graves) sur une période. 
@@ -183,6 +181,33 @@ def get_answer_prompt_top_5(contexts: dict, results: dict):
                     entre 16h–19h, pluie. 
                     o Hotspot #2 : Zone  (rayon 300 m) - 120 requêtes 311 
                     « déneigement » en 2 semaines. 
+            Tendances
+            L’évolution dans le temps : ça augmente, ça baisse, ça change de nature.
+                • Exemples :
+                    o Les collisions piétons augmentent de 18% sur les 3 derniers mois vs
+                    la même période l’an passé.
+                    o Les requêtes 311 « nids-de-poule » explosent 7 à 10 jours après les
+                    cycles gel/dégel.
+                    o Le pic horaire se déplace : avant entre 17h et 19h, maintenant entre
+                    15h et 17h.
+                • Format attendu :
+                    o Période, comparaison (p. ex., semaine vs semaine / mois vs mois), et
+                    une phrase d’interprétation.
+            Signaux faibles
+            Des petits changements précoces qui ne sont pas encore gros en volume, mais qui
+            peuvent annoncer un problème futur.
+                • Exemples :
+                    o Dans le quartier C, les requêtes 311 « aqueduc/fuite » restent
+                    faibles, mais augmentent régulièrement depuis 6 semaines.
+                    o Un nouveau micro-hotspot apparaît près de l’arrêt D : encore
+                    peu d’événements, mais hausse continue.
+                    o Augmentation anormale des collisions par brouillard sur un
+                    tronçon précis (rare, mais en croissance).
+                • Ce qui rend un signal faible intéressant :
+                    o Il est nouveau, localisé, persistant, ou lié à un facteur externe
+                    (météo, travaux, événement).
+
+            Suis bien les formats attendus en t'aidant des exemples. Pour les hotspots, fais une liste numerotée.
             """
     return get_answer_prompt
 

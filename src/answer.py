@@ -84,7 +84,7 @@ def ask(question: str, history: list[tuple[str, str]] = None):
 
     return answer
 
-def get_top5():
+def get_top5(tone = "grand public"):
 
     contexts = get_datasets_metadata()
 
@@ -96,7 +96,7 @@ def get_top5():
     )
 
 
-    prompt = get_answer_prompt_top_5(contexts, results)
+    prompt = get_answer_prompt_top_5(contexts, results, tone)
 
     print (prompt)
     response = ollama.generate(model=LANGUAGE_MODEL, prompt=prompt)
