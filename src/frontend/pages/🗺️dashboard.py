@@ -17,7 +17,7 @@ with st.sidebar:
     if "html_code_1" not in st.session_state:
         st.session_state.html_code_1 = heatmap_collisions_filtree(date_debut, date_fin)
         st.session_state.html_code_2 = heatmap_collisions_filtree(date_debut, date_fin)
-        st.session_state.html_code_3 = heatmap_collisions_filtree(date_debut, date_fin)
+        st.session_state.fig_3 = heatmap_collisions_filtree(date_debut, date_fin)
         st.session_state.html_code_4 = heatmap_collisions_filtree(date_debut, date_fin)
 
     is_valid_date = date_debut > date_fin
@@ -31,7 +31,7 @@ with st.sidebar:
         # Remplacer par les fonctions qui génèrent les graphiques en fonction des dates sélectionnées
         st.session_state.html_code_1 = heatmap_collisions_filtree(date_debut, date_fin)
         st.session_state.html_code_2 = heatmap_collisions_filtree(date_debut, date_fin)
-        st.session_state.html_code_3 = heatmap_collisions_filtree(date_debut, date_fin)
+        st.session_state.fig_3 = heatmap_collisions_filtree(date_debut, date_fin)
         st.session_state.html_code_4 = heatmap_collisions_filtree(date_debut, date_fin)
 
         st.rerun()
@@ -59,10 +59,10 @@ st.divider()
 with st.container():
     st.subheader("Graphique 3") #Titre a modifier
     st.caption("Description du graphique 3.") # Description a modifier
-    if st.session_state.html_code_3 == "None":
+    if st.session_state.fig_3 == "None":
         st.warning("Aucune donnée disponible pour la période sélectionnée.")
     else:
-        components.html(st.session_state.html_code_3, height=500)
+        st.pyplot(st.session_state.fig_3, height=500)
 
 st.divider()
 
