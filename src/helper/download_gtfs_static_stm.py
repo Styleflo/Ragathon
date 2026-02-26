@@ -26,6 +26,11 @@ import requests
 
 DEFAULT_URL = "https://www.stm.info/sites/default/files/gtfs/gtfs_stm.zip"
 
+# Chemin absolu vers src/ (parent de helper/)
+SRC_DIR = Path(__file__).resolve().parent.parent
+DEFAULT_OUT_DIR = SRC_DIR / "data"
+DEFAULT_CACHE_ZIP = SRC_DIR / "data" / "_cache" / "gtfs_stm.zip"
+
 
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
@@ -77,12 +82,12 @@ def main() -> int:
     ap.add_argument("--url", default=DEFAULT_URL, help="URL du zip GTFS")
     ap.add_argument(
         "--out-dir",
-        default="src/data/",
+        default=str(DEFAULT_OUT_DIR),
         help="Dossier cible où copier les .txt (créé si absent)",
     )
     ap.add_argument(
         "--cache-zip",
-        default="src/data/_cache/gtfs_stm.zip",
+        default=str(DEFAULT_CACHE_ZIP),
         help="Chemin local pour stocker le zip téléchargé",
     )
     ap.add_argument(
