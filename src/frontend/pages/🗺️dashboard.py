@@ -48,8 +48,8 @@ with st.container():
 st.divider() 
 
 with st.container():
-    st.subheader("Graphique 2") #Titre a modifier
-    st.caption("Description du graphique 2.") # Description a modifier
+    st.subheader("Nuage de points des requêtes 311")
+    st.caption("Distribution des demandes 311 et de leurs catégories à Montréal selon la période choisie.")
     if st.session_state.html_code_2 == "None":
         st.warning("Aucune donnée disponible pour la période sélectionnée.")
     else:
@@ -59,7 +59,7 @@ st.divider()
 
 with st.container():
     st.subheader("Répartition (%) de la Gravité selon la Météo")
-    st.caption("Description du graphique 3.") # Description a modifier
+    st.caption("Lien entre les conditions météorologiques à Montréal et la sévérité des accidents pour la période choisie.")
     if st.session_state.fig_3 == "None":
         st.warning("Aucune donnée disponible pour la période sélectionnée.")
     else:
@@ -70,9 +70,10 @@ st.divider()
 with st.container():
     if (date_fin_object - date_debut_object).days > 365:
         st.subheader("Nombre d'accidents par mois")
+        st.caption("Illustration de la répartition des accidents selon les mois.")
     else:
         st.subheader("Nombre d'accidents par jours")
-    st.caption("Description du graphique 4.") # Description a modifier
+        st.caption("Illustration de la répartition des accidents selon les jours.")
     if st.session_state.fig_4 == "None":
         st.warning("Aucune donnée disponible pour la période sélectionnée.")
     else:
