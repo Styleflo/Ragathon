@@ -4,13 +4,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ollama
+    image: hackathon-ai-engine
     volumes:
       - ollama_storage:/root/.ollama
 
   webapp:
+
     build:
       context: .
       dockerfile: Dockerfile
+    image: hackathon-webapp
     ports:
       - "8080:8080"
     environment:
