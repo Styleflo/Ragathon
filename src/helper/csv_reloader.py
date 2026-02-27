@@ -7,6 +7,7 @@ import time
 
 URL_CSV_311 = "https://donnees.montreal.ca/dataset/5866f832-676d-4b07-be6a-e99c21eb17e4/resource/2cfa0e06-9be4-49a6-b7f1-ee9f2363a872/download/requetes311.csv"
 URL_WEATHER = "https://climate.weather.gc.ca/climate_data/bulk_data_f.html"
+URL_COLLISION = "https://donnees.montreal.ca/dataset/cd722e22-376b-4b89-9bc2-7c7ab317ef6b/resource/05deae93-d9fc-4acb-9779-e0942b5e962f/download/collisions_routieres.csv"
 
 BASE_DIR = Path(__file__).resolve().parent
 SRC_DIR = BASE_DIR.parent
@@ -15,6 +16,7 @@ DATA_DIR = SRC_DIR / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 csv_path = DATA_DIR / "requetes311.csv"
+csv_path_collision = DATA_DIR / "collisions_routieres.csv"
 
 
 def csv311_reload():
@@ -30,6 +32,18 @@ def csv311_reload():
     else:
         print("Erreur :", response.status_code)
 
+def collision_reload():
+    start = time.time()
+    response = requests.get(URL_COLLISION)
+    end = time.time()
+
+    print(f"réponse complète en : {end - start:.2f} secondes")
+
+    if response.status_code == 200:
+        csv_path_collision.write_bytes(response.content)
+        print(f"Fichier téléchargé avec succès : {csv_path_collision}")
+    else:
+        print("Erreur :", response.status_code)
 
 def download_weather_csv(station_id, start_year=2022):
     all_data = []
@@ -71,4 +85,5 @@ def download_weather_csv(station_id, start_year=2022):
 
 if __name__ == "__main__":
     csv311_reload()
+    collision_reload()
     download_weather_csv("51157", 2022)
