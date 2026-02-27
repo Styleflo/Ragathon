@@ -74,17 +74,17 @@ Le copilote utilise exclusivement des données ouvertes :
 
 ### Étape 5 : Installer les modèles d'embedding et de génération
 ```bash
-  ollama pull qwen2.5-coder
   ollama pull bge-m3
+  ollama pull gemma3:4b
 ```
 
 ### Étape 6 : Télécharger les données
 ```bash
   cd ./src/helper
   python csv_reloader.py
+  python download_gtfs_static_stm.py
 ```
 Cela crée un dossier data dans le dossier src et ajoute les datasets nécessaires.
-Les derniers datasets sont à télécharger [ici](https://drive.google.com/drive/folders/1oFofq2gwn5JJhCBvQEOQleBHtVOwhDt9?usp=sharing).
 
 ### Étape 7 : Lancer le projet
 ```bash
