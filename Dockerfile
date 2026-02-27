@@ -9,6 +9,10 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src ./src
+
+COPY entrypoint.sh ./
+RUN chmod +x entrypoint.sh
+
 EXPOSE 8080
 
-CMD ["streamlit", "run", "src/frontend/Copilot.py", "--server.port=8080", "--server.address=0.0.0.0"]
+ENTRYPOINT ["./entrypoint.sh"]

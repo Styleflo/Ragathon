@@ -18,8 +18,11 @@ services:
       - "8080:8080"
     environment:
       - OLLAMA_HOST=http://ai-engine:11434
+    volumes:
+      - webapp_data:/app/src/data
     depends_on:
       - ai-engine
 
 volumes:
   ollama_storage:
+  webapp_data:
