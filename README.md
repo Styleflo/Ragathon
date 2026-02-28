@@ -91,3 +91,24 @@ Cela crée un dossier data dans le dossier src et ajoute les datasets nécessair
   cd ./src/frontend
   streamlit run Copilot.py
 ```
+
+## Docker 
+
+Si vous préférez utiliser docker, c'est tout à fait possible voici la demarche.
+
+### Étape 1 : cloner le repertoire
+```bash
+   git clone https://github.com/Styleflo/Ragathon.git
+   cd Ragathon
+```
+
+### Étape 2 : build les images
+```bash
+  docker-compose build
+```
+Attention cela peut prendre beaucoup de temps. Cela installe tout ce qui est nécéssaire.
+
+### Étape 3 : on lance les images
+```bash
+  docker-compose up
+```
