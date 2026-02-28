@@ -7,6 +7,7 @@ venv/
 .idea/
 .DS_Store/
 src/data/
+src/db_*
 
 
 # Autres trucs
